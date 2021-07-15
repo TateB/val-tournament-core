@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>settings</title>
+  <style>
+      body {
+          margin:0;
+          padding:0;
+          display: flex;
+          flex-direction: row;
+          height: 100vh;
+          width: 100%;
+          justify-content: center;
+          align-items: center;
+          background-color: lightgrey;
+      }
+      #maps {
+          display: flex;
+          flex-direction: column;
+          padding-left: 20px;
+          border-left-color: black;
+          border-left-width: 3px;
+          border-left-style: solid;
+      }
+
+      #teams {
+          display: flex;
+          flex-direction: column;
+          padding-right: 20px;
+      }
+
+      .mapSelect {
+          display: flex;
+          flex-direction: row;
+      }
+
+      .inner {
+          max-height: 300px;
+          display: flex;
+          flex-direction: row;
+          background-color: white;
+          padding: 100px;
+          box-shadow: 13px 13px 40px 5px rgba(0,0,0,0.75);
+      }
+      .grow {
+          flex-grow: 1;
+      }
+
+      input[type="submit"] {
+          height: 50px;
+          margin-top: 10px;
+      }
+  </style>
+</head>
+<body>
+    <div class="inner">
+        <form action="/submitteams" id="teams">
+            <label for="teama">team a:</label>
+            <input type="text" name="teama" placeholder="<%= teams[0] %>"/>
+            <label for="teamb">team b:</label>
+            <input type="text" name="teamb" placeholder="<%= teams[1] %>"/>
+            <div class="grow"></div>
+            <input type="submit" value="submit">
+        </form>
+
+        <form action="/submitmaps" id="maps">
+            <% for(var ii=0; ii<maps.length; ii++) {%>
+                <label for="<%= ii %>">pick <%= ii %></label>
+                <div class="mapSelect">
+                    <select name="<%= ii %>">
+                        <% for(var i=0; i<options.length; i++) {%>
+                            <option <% if (options[i] == maps[ii].map) { %> selected <% } %> value="<%=  options[i] %>"><%=  options[i] %></option>
+                        <% } %>
+                    </select>
+                    <select name="<%= ii %>.ban">
+                        <option value="ban" <% if (maps[ii].isBan) { %> selected <% } %> >ban</option>
+                        <option value="pick" <% if (!maps[ii].isBan) { %> selected <% } %>>pick</option>
+                    </select>
+                    <select name="<%= ii %>.teamPick">
+                        <% for(var i=0; i<teams.length; i++) {%>
+                            <option <% if (maps[ii].teamPick == teams[i]) { %> selected <% } %>  value="<%=  teams[i] %>"><%=  teams[i] %></option>
+                        <% } %>
+                        <option <% if (maps[ii].teamPick == "auto") { %> selected <% } %> value="auto">auto</option>
+                    </select>
+                    <select name="<%= ii %>.sidePick">
+                        <option value="defense" <% if (maps[ii].sidePick == "defense") { %> selected <% } %> >defense</option>
+                        <option value="attack" <% if (maps[ii].sidePick == "attack") { %> selected <% } %> >attack</option>
+                    </select>
+                </div>
+            <% } %>
+            <input type="submit" value="submit">
+        </form>
+    </div>
+</body>
+</html>

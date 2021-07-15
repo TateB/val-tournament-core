@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>obs</title>
+  <style>
+      :root {
+          --accent-color: #ff4654;
+      }
+
+      body {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        font-family: "Poppins";
+        margin: 50px;
+      }
+      .map {
+          width: 300px;
+          height: 600px;
+          display: flex;
+        flex-direction: column;
+        
+      }
+
+      .spacer {
+        flex-grow: 1;
+      }
+
+      .info  {
+        margin-bottom: -20px;
+        margin-left: -20px;
+        margin-right: 20px;
+        background-color: #0f1822;
+        padding: 10px;
+        color: white;
+        border-left-color: var(--accent-color);
+        border-left-width: 6px;
+        border-left-style: solid;
+        font-weight: 500 !important;
+      }
+
+      .info p {
+          font-size: 1em;;
+        margin: 0;
+      }
+
+      h1 {
+        margin-left: -20px;
+        margin-right: 20px;
+        background-color: #0f1822;
+        padding: 10px;
+        color: white;
+        border-left-color: var(--accent-color);
+        border-left-width: 6px;
+        border-left-style: solid;
+      }
+  </style>
+</head>
+<body>
+    <% for(var i=0;i<maps.length;i++) { %>
+        <div 
+            class="<%= maps[i].map %> <% if (maps[i].isBan) { %>isBan<% } %> map"
+            style="background: url('/maps/<%= maps[i].map %>.png'); background-position: center;background-size: cover;"
+            >
+            <h1><%= maps[i].map %></h1>
+            <div class="spacer"></div>
+            <div class="info">
+                <p class="pick">picked by <%= maps[i].teamPick %></p>
+                <p class="side"><%= teams.filter(x => (x !== maps[i].teamPick)) %> start on <%= maps[i].sidePick %></p>
+            </div>
+        </div>
+    <% } %>
+</body>
