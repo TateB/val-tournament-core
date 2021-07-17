@@ -90,9 +90,7 @@
         height: 200px;
       }
 
-      .nodisplay {
-        display: none;
-      }
+      
 
       .bannedMap .info {
         min-height:auto;
@@ -102,7 +100,7 @@
       .bannedMaps {
         max-height: 100vh;
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         justify-content: space-around;
         margin-right: 150px;
 
@@ -132,6 +130,7 @@
       .twocolumn.bannedMaps {
         margin-right: 0px;
         justify-content: space-between;
+        flex-direction: row;
       }
 
       .twocolumn .bannedMap {
@@ -167,10 +166,25 @@
       .twocolumn .bannedMap:first-child .info {
         margin-top: 400px;
       }
+
+      .nodisplay {
+        display: none !important;
+      }
+      .autoban.nootherbans {
+        position: fixed;
+        margin-top: 680px;
+        margin-left: 25px;
+        line-height: 25px;
+      }
   </style>
 </head>
 <body>
-    <div class="bannedMaps <%= bannedMaps.length > 2 ? "twocolumn" : "" %>">
+  <% if (bannedMaps.length == 0) { %>
+  <div>
+    <h3 class="nootherbans autoban <%= isLowerCase ? "lowercase" : "uppercase" %>"><%= maps[autoBannedMaps[0].map] %><% if (bannedMaps.length > 2) { %><br/><% } else { %> <% } %>AUTOBANNED</h3>
+  </div>
+  <% } %>
+    <div class="bannedMaps <%= bannedMaps.length == 0 ? "nodisplay" : "" %> <%= bannedMaps.length > 2 ? "twocolumn" : "" %>">
     <% 
     for(var i=0;i<bannedMaps.length;i++) { 
       let mapd = bannedMaps[i]

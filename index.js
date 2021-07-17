@@ -12,15 +12,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'html');
 
 var maps = ["ascent", "bind", "breeze", "haven", "icebox", "split"]
-var teams = ["POTENT", "Eclipse Esports", "auto"]
-var teamShorts = ["PTNT", "ECLP"]
+var teams = ["Cool Team", "Gamerz", "auto"]
+var teamShorts = ["ATM", "BTM"]
 var sides = ["attack", "defense"]
 
 var mapOrder = [
     { map: 4, isBan: true, teamPick: 0, sidePick: 1, isShowing: true, },
     { map: 3, isBan: true, teamPick: 1, sidePick: 1, isShowing: true, },
-    { map: 5, isBan: true, teamPick: 0, sidePick: 0, isShowing: true, },
-    { map: 2, isBan: true, teamPick: 1, sidePick: 1, isShowing: true, },
+    { map: 5, isBan: false, teamPick: 0, sidePick: 0, isShowing: true, },
+    { map: 2, isBan: false, teamPick: 1, sidePick: 1, isShowing: true, },
     { map: 0, isBan: false, teamPick: 0, sidePick: 1, isShowing: true, },
     { map: 1, isBan: true, teamPick: 2, sidePick: 0, isShowing: true, }
  ]
