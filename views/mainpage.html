@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>settings</title>
+  <style>
+      body {
+          font-family: "Poppins", sans-serif;
+          margin:0;
+          padding:0;
+          display: flex;
+          flex-direction: row;
+          height: 100vh;
+          width: 100%;
+          justify-content: center;
+          align-items: center;
+          background-color: lightgrey;
+      }
+      #maps {
+          display: flex;
+          flex-direction: column;
+          padding-left: 20px;
+          border-left-color: black;
+          border-left-width: 3px;
+          border-left-style: solid;
+      }
+
+      #teams {
+          display: flex;
+          flex-direction: column;
+          padding-right: 20px;
+      }
+
+      .mapSelect {
+          display: flex;
+          flex-direction: row;
+      }
+
+      .inner {
+          min-height: 350px;
+          max-height: 500px;
+          display: flex;
+          flex-direction: row;
+          background-color: white;
+          padding: 100px;
+          box-shadow: 13px 13px 40px 5px rgba(0,0,0,0.75);
+      }
+      .grow {
+          flex-grow: 1;
+      }
+
+      input[type="submit"] {
+          height: 50px;
+          margin-top: 10px;
+      }
+
+      textarea {
+          min-height: 200px;
+      }
+      button {
+          margin-top: 5px;
+      }
+      a {
+          min-height: 25px;
+          background-color: black;
+          padding-top: 10px;
+          padding-bottom: 10px;
+          text-decoration: none;
+          font-size: 0.8em;
+          text-align: center;
+          line-height: 2em;
+          color: white;
+          transition: 0.3s all;
+      }
+
+      a:hover {
+        background-color: grey;
+      }
+  </style>
+</head>
+<body>
+    <div class="outer">
+        <div class="inner">
+            <form action="/submitteams" id="teams">
+                <label for="teama">team a:</label>
+                <input type="text" name="teama" placeholder="<%= teams[0] %>"/>
+                <input type="text" name="teamaShort" placeholder="<%= teamShorts[0] %>" >
+                <label for="teamb">team b:</label>
+                <input type="text" name="teamb" placeholder="<%= teams[1] %>"/>
+                <input type="text" name="teambShort" placeholder="<%= teamShorts[1] %>" >
+                <label for="useVOTColours">Use VOT Colours:</label>
+                <input type="checkbox" <%= otherSettings.useVOTColours ? "checked" : "" %> name="useVOTColours" />
+                <div class="grow"></div>
+                <input type="submit" value="submit">
+            </form>
+            <form action="/submitmapsbeta" id="maps">
+                <label for="vetotext">full veto transcript:</label>
+                <textarea name="vetotext"></textarea>
+                <div class="grow"></div>
+                <a href="/manualinput">MANUAL VETO EDITING</a>
+                <input type="submit" value="submit">
+            </form>
+        </div>
+    </div>
+</body>
+</html>

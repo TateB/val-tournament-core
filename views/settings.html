@@ -6,6 +6,7 @@
   <title>settings</title>
   <style>
       body {
+        font-family: "Poppins", sans-serif;
           margin:0;
           padding:0;
           display: flex;
@@ -19,16 +20,11 @@
       #maps {
           display: flex;
           flex-direction: column;
-          padding-left: 20px;
-          border-left-color: black;
-          border-left-width: 3px;
-          border-left-style: solid;
       }
 
       #teams {
           display: flex;
           flex-direction: column;
-          padding-right: 20px;
       }
 
       .mapSelect {
@@ -37,7 +33,7 @@
       }
 
       .inner {
-          max-height: 300px;
+          min-height: 300px;
           display: flex;
           flex-direction: row;
           background-color: white;
@@ -52,41 +48,65 @@
           height: 50px;
           margin-top: 10px;
       }
+      a {
+          min-height: 25px;
+          background-color: black;
+          padding-top: 10px;
+          padding-bottom: 10px;
+          padding-left: 50px;
+          padding-right: 50px;
+          text-decoration: none;
+          font-size: 0.8em;
+          text-align: center;
+          line-height: 2em;
+          color: white;
+          transition: 0.3s all;
+          margin-bottom: 10px;
+      }
+
+      a:hover {
+        background-color: grey;
+      }
   </style>
 </head>
 <body>
     <div class="inner">
-        <form action="/submitteams" id="teams">
-            <label for="teama">team a:</label>
-            <input type="text" name="teama" placeholder="<%= teams[0] %>"/>
-            <label for="teamb">team b:</label>
-            <input type="text" name="teamb" placeholder="<%= teams[1] %>"/>
-            <div class="grow"></div>
-            <input type="submit" value="submit">
-        </form>
-
         <form action="/submitmaps" id="maps">
-            <% for(var ii=0; ii<maps.length; ii++) {%>
-                <label for="<%= ii %>">pick <%= ii %></label>
+            <div class="mapSelect">
+                <a href="/">BACK</a>
+                <div class="grow"></div>
+            </div>
+            <div class="mapSelect">
+                <label for="showBans">show bans:</label>
+                <input type="checkbox" <%= otherSettings.showBans ? "checked" : "" %> name="showBans">
+                <div class="grow"></div>
+                <label for="showAutobans">show autoban:</label>
+                <input type="checkbox" <%= otherSettings.showAutobans ? "checked" : "" %> name="showAutobans">
+            </div>
+            <% for(var ii=0; ii<mapOrder.length; ii++) {%>
+                <div class="mapselect">
+                    <label for="<%= ii %>">pick <%= ii %></label>
+                    <input type="checkbox" <%= mapOrder[ii].isShowing ? "checked" : "" %> name="<%= ii %>.isShowing" />
+                    <div class="grow"></div>
+                </div>
                 <div class="mapSelect">
-                    <select name="<%= ii %>">
-                        <% for(var i=0; i<options.length; i++) {%>
-                            <option <% if (options[i] == maps[ii].map) { %> selected <% } %> value="<%=  options[i] %>"><%=  options[i] %></option>
+                    <select name="<%= ii %>.map">
+                        <% for(var i=0; i<maps.length; i++) {%>
+                            <option <% if (i == mapOrder[ii].map) { %> selected <% } %> value="<%=  maps[i] %>"><%=  maps[i] %></option>
                         <% } %>
                     </select>
                     <select name="<%= ii %>.ban">
-                        <option value="ban" <% if (maps[ii].isBan) { %> selected <% } %> >ban</option>
-                        <option value="pick" <% if (!maps[ii].isBan) { %> selected <% } %>>pick</option>
+                        <option value="ban" <% if (mapOrder[ii].isBan) { %> selected <% } %> >ban</option>
+                        <option value="pick" <% if (!mapOrder[ii].isBan) { %> selected <% } %>>pick</option>
                     </select>
                     <select name="<%= ii %>.teamPick">
                         <% for(var i=0; i<teams.length; i++) {%>
-                            <option <% if (maps[ii].teamPick == teams[i]) { %> selected <% } %>  value="<%=  teams[i] %>"><%=  teams[i] %></option>
+                            <option <% if (mapOrder[ii].teamPick == i) { %> selected <% } %>  value="<%=  teams[i] %>"><%=  teams[i] %></option>
                         <% } %>
-                        <option <% if (maps[ii].teamPick == "auto") { %> selected <% } %> value="auto">auto</option>
                     </select>
                     <select name="<%= ii %>.sidePick">
-                        <option value="defense" <% if (maps[ii].sidePick == "defense") { %> selected <% } %> >defense</option>
-                        <option value="attack" <% if (maps[ii].sidePick == "attack") { %> selected <% } %> >attack</option>
+                        <option value="defense" <% if (mapOrder[ii].sidePick == 1) { %> selected <% } %> >defense</option>
+                        <option value="attack" <% if (mapOrder[ii].sidePick == 0) { %> selected <% } %> >attack</option>
                     </select>
                 </div>
             <% } %>
