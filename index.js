@@ -12,8 +12,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'html');
 
 var maps = ["ascent", "bind", "breeze", "haven", "icebox", "split"]
-var teams = ["Cool Team", "Gamerz", "auto"]
-var teamShorts = ["ATM", "BTM"]
+var teams = ["Pigeon Esports", "Dire Wolves", "auto"]
+var teamShorts = ["PIG", "DW", "AUTO"]
 var sides = ["attack", "defense"]
 
 var mapOrder = [
@@ -102,6 +102,7 @@ app.get('/submitmapsbeta', (req, res) => {
     let vetos = req.query.vetotext
     let mapPicks = vetos.split(/\r?\n/).map(x => x.toLowerCase()) // splits into lines
     let potentialTeamSearch = teams.map( x => x.split(' ')[0].toLowerCase()) // first word if multiple words, easier to search
+    let potentialTeamSearchShort = teamShorts.map(x => x.toLowerCase())
     mapOrder = []
     for (const [id, mapline] of mapPicks.entries()) {
         let words = mapline.split(' ')
@@ -109,12 +110,14 @@ app.get('/submitmapsbeta', (req, res) => {
         let pickWords = ["picks", "picked", "pick"]
         let atkWords = ["atk", "attack", "attackers", "attacking"]
         let defWords = ["def", "defense", "defence", "defending", "defenders"]
+        
+        var teampick;
+        let teamword = words.find((x) => 
+            potentialTeamSearch.includes(x) || potentialTeamSearchShort.includes(x)
+        )
 
-        let teampick = potentialTeamSearch.indexOf(
-            words.find((x) => 
-                    potentialTeamSearch.includes(x)
-                )
-            )
+        if (potentialTeamSearch.indexOf(teamword) !== -1) teampick = potentialTeamSearch.indexOf(teamword)
+        if (potentialTeamSearchShort.indexOf(teamword) !== -1) teampick = potentialTeamSearchShort.indexOf(teamword)
 
         let chosenMap = maps.indexOf(words.find(x => maps.includes(x)))
         let isBan = words.find(x => banWords.includes(x)) ? true : false
@@ -152,8 +155,23 @@ app.get('/submitmapsbeta', (req, res) => {
             })
 
             if (id+1 == mapPicks.length) {
-                console.log("directing...")
-                res.redirect('/')
+                if (mapOrder.find(x => x.teamPick == 2)) {
+                    console.log("directing...")
+                    res.redirect('/')
+                } else {
+                    console.log('adding autoban')
+                    let mapsAdded = mapOrder.map(x => x.map)
+                    let difference = maps.filter(x => !mapsAdded.includes(maps.indexOf(x)));
+                    mapOrder.push({
+                        map: maps.indexOf(difference[0]),
+                        isBan: true,
+                        teamPick: 2,
+                        sidePick: -1,
+                    })
+
+                    console.log(mapOrder)
+                    res.redirect('/')
+                }
             }
         } else {
             res.redirect('/error')
