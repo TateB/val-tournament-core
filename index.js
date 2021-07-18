@@ -33,20 +33,6 @@ var otherSettings = {
 }
 
 app.get('/obs', (req, res) => {
-    console.log("loading obs...")
-
-    console.log({
-        mapOrder: mapOrder.filter(x => (x.teamPick !== 2 && x.isBan == false)),
-        bannedMaps: mapOrder.filter(x => (x.isBan == true && x.teamPick !== 2)),
-        autoBannedMaps: mapOrder.filter(x => (x.teamPick === 2)),
-        teams: teams,
-        teamShorts: teamShorts,
-        maps: maps,
-        sides: sides,
-        isLowerCase: isLowerCase,
-        otherSettings: otherSettings,
-      })
-
   res.render('obs', {
     mapOrder: mapOrder.filter(x => (x.teamPick !== 2 && x.isBan == false)),
     bannedMaps: mapOrder.filter(x => (x.isBan == true && x.teamPick !== 2)),
@@ -81,7 +67,6 @@ app.get('/', (req, res) => {
 })
 
 app.get('/submitmaps', (req, res) => {
-    console.log(req.query)
     var newMapOrder = []
     for (const [key, value] of Object.entries(req.query)) {
         let info = key.split('.')
@@ -119,7 +104,6 @@ app.get('/submitmapsbeta', (req, res) => {
     let potentialTeamSearch = teams.map( x => x.split(' ')[0].toLowerCase()) // first word if multiple words, easier to search
     mapOrder = []
     for (const [id, mapline] of mapPicks.entries()) {
-        console.log("mapline: " + mapline)
         let words = mapline.split(' ')
         let banWords = ["banned", "bans", "ban"]
         let pickWords = ["picks", "picked", "pick"]
@@ -141,7 +125,6 @@ app.get('/submitmapsbeta', (req, res) => {
 
         var sidePick;
         if (!isBan && teampick !== 2) {
-            console.log(words.find(x => atkWords.includes(x)) ? true : false)
             sidePick = words.find(x => atkWords.includes(x)) ? 0 : 1
             if (sidePick === 1 && words.find(x => defWords.includes(x)) == undefined) {
                 console.error(`Mapline ${id} doesn't have a side selected`)
