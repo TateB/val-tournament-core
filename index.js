@@ -33,7 +33,19 @@ var otherSettings = {
 }
 
 app.get('/obs', (req, res) => {
-    console.log(mapOrder)
+    console.log("loading obs...")
+
+    console.log({
+        mapOrder: mapOrder.filter(x => (x.teamPick !== 2 && x.isBan == false)),
+        bannedMaps: mapOrder.filter(x => (x.isBan == true && x.teamPick !== 2)),
+        autoBannedMaps: mapOrder.filter(x => (x.teamPick === 2)),
+        teams: teams,
+        teamShorts: teamShorts,
+        maps: maps,
+        sides: sides,
+        isLowerCase: isLowerCase,
+        otherSettings: otherSettings,
+      })
 
   res.render('obs', {
     mapOrder: mapOrder.filter(x => (x.teamPick !== 2 && x.isBan == false)),
@@ -126,12 +138,19 @@ app.get('/submitmapsbeta', (req, res) => {
             console.error(`Mapline ${id} is neither a pick nor a ban`)
             invalid = true
         }
-        console.log(words.find(x => atkWords.includes(x)) ? true : false)
-        let sidePick = words.find(x => atkWords.includes(x)) ? 0 : 1
-        if (sidePick === 1 && words.find(x => defWords.includes(x)) == undefined) {
-            console.error(`Mapline ${id} doesn't have a side selected`)
-            invalid = true
+
+        var sidePick;
+        if (!isBan && teampick !== 2) {
+            console.log(words.find(x => atkWords.includes(x)) ? true : false)
+            sidePick = words.find(x => atkWords.includes(x)) ? 0 : 1
+            if (sidePick === 1 && words.find(x => defWords.includes(x)) == undefined) {
+                console.error(`Mapline ${id} doesn't have a side selected`)
+                invalid = true
+            }
+        } else {
+            sidePick = -1
         }
+        
 
 
         if (!invalid) {
