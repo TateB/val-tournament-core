@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .cls-2,
+                .cls-3 {
+                    color: #fff;
+                    font-family: Poppins-Medium, Poppins;
+                    font-weight: 500;
+                }
+
+                .cls-3 {
+                    font-size: 50px;
+                }
+    </style>
+
+    <script>
+        var ogSeconds = <%= seconds %>
+
+        setInterval(() => {
+            fetch('/timer/live').then((res) => {
+                return res.json()
+            }).then((json) => {
+                let { reset, seconds } = json
+                if (reset) {
+                    ogSeconds = seconds
+                } else if (ogSeconds < 0) {
+                    return
+                }
+                let now = new Date().getTime()
+                let countDownTo = now + ogSeconds * 1000
+                let distance = countDownTo - now
+
+                var minutesCd = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
+                minutesCd < 10 ? minutesCd = "0" + minutesCd : null
+                var secondsCd = Math.floor((distance % (1000 * 60)) / 1000)
+                secondsCd < 10 ? secondsCd = "0" + secondsCd : null
+                document.getElementById("seconds").innerHTML = minutesCd + ":" + secondsCd
+                ogSeconds -= 1
+            })
+        }, 1000)
+    </script>
+</head>
+
+<body>
+    <p id="seconds" class="cls-3"><%= stMinutes %>:<%= stSeconds %></p>
+</body>
+
+</html>

@@ -4,7 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>obs</title>
-  <% if (otherSettings.useVOTColours) { %>
+  <% 
+  let { isLowerCase } = otherSettings
+  if (otherSettings.useVOTColours) { %>
   <style>
     :root {
           --accent-color: #ff4654;

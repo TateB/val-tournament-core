@@ -1,95 +1,28 @@
-const { query } = require('express');
-const express = require('express')
-var path = require('path');
-const app = express()
+import express from "express"
+import path from "path"
+import db from "./db.mjs"
+import { renderFile } from "ejs"
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
+const app = express()
 const port = 3000
 
-
-app.engine('.html', require('ejs').__express);
+app.engine('.html', renderFile);
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'html');
 
-var maps = ["ascent", "bind", "breeze", "haven", "icebox", "split"]
-var teams = ["Pigeon Esports", "Dire Wolves", "auto"]
-var teamShorts = ["PIG", "DW", "AUTO"]
-var sides = ["attack", "defense"]
+import mb from "./apps/mapbans.js"
+import settings from "./apps/settings.js"
+import scoreoverlay from "./apps/scoreoverlay.js"
+import timer from "./apps/timer.js"
 
-var mapOrder = [
-    { map: 4, isBan: true, teamPick: 0, sidePick: 1, isShowing: true, },
-    { map: 3, isBan: true, teamPick: 1, sidePick: 1, isShowing: true, },
-    { map: 5, isBan: false, teamPick: 0, sidePick: 0, isShowing: true, },
-    { map: 2, isBan: false, teamPick: 1, sidePick: 1, isShowing: true, },
-    { map: 0, isBan: false, teamPick: 0, sidePick: 1, isShowing: true, },
-    { map: 1, isBan: true, teamPick: 2, sidePick: 0, isShowing: true, }
- ]
-
-var isLowerCase = false;
-var otherSettings = {
-    "showBans": true,
-    "showAutobans": true,
-    "useVOTColours": true,
-}
-
-app.get('/obs', (req, res) => {
-  res.render('obs', {
-    mapOrder: mapOrder.filter(x => (x.teamPick !== 2 && x.isBan == false)),
-    bannedMaps: mapOrder.filter(x => (x.isBan == true && x.teamPick !== 2)),
-    autoBannedMaps: mapOrder.filter(x => (x.teamPick === 2)),
-    teams: teams,
-    teamShorts: teamShorts,
-    maps: maps,
-    sides: sides,
-    isLowerCase: isLowerCase,
-    otherSettings: otherSettings,
-  })
-})
-
-app.get('/manualinput', (req, res) => {
-    res.render('settings', {
-        maps: maps,
-        mapOrder: mapOrder,
-        teams: teams,
-        teamShorts: teamShorts,
-        otherSettings: otherSettings,
-    })
-})
-
-app.get('/', (req, res) => {
-    res.render('mainpage', {
-        options: maps,
-        maps: mapOrder,
-        teams: teams,
-        teamShorts: teamShorts,
-        otherSettings, otherSettings,
-    })
-})
-
-app.get('/submitmaps', (req, res) => {
-    var newMapOrder = []
-    for (const [key, value] of Object.entries(req.query)) {
-        let info = key.split('.')
-        if (info[1] == undefined) {
-            value != undefined ? otherSettings[key] = (value == "on" ? true : false) : null
-        } else {
-            let num = info[0]
-            let name = info[1]
-            newMapOrder[num] ? null : newMapOrder[num] = {}
-            value != undefined ? newMapOrder[num][name] = value : null
-        }
-    }
-    
-    mapOrder = newMapOrder.map((x, i) => x = {
-        "map": maps.findIndex(z => z == x.map),
-        "isBan": x.ban == "ban" ? true : false,
-        "teamPick": teams.findIndex(z => z == x.teamPick),
-        "sidePick": sides.findIndex(z => z == x.sidePick),
-        "isShowing": x.isShowing == "on" ? true : false,
-    })
-
-    res.redirect('/');
-})
+mb.forward(app)
+settings.forward(app)
+scoreoverlay.forward(app)
+timer.forward(app)
 
 app.get('/error', (req, res) => {
     res.render('error', {
@@ -97,101 +30,8 @@ app.get('/error', (req, res) => {
     })
 })
 
-app.get('/submitmapsbeta', (req, res) => {
-    var invalid = false
-    let vetos = req.query.vetotext
-    let mapPicks = vetos.split(/\r?\n/).map(x => x.toLowerCase()) // splits into lines
-    let potentialTeamSearch = teams.map( x => x.split(' ')[0].toLowerCase()) // first word if multiple words, easier to search
-    let potentialTeamSearchShort = teamShorts.map(x => x.toLowerCase())
-    mapOrder = []
-    for (const [id, mapline] of mapPicks.entries()) {
-        let words = mapline.split(' ')
-        let banWords = ["banned", "bans", "ban"]
-        let pickWords = ["picks", "picked", "pick"]
-        let atkWords = ["atk", "attack", "attackers", "attacking"]
-        let defWords = ["def", "defense", "defence", "defending", "defenders"]
-        
-        var teampick;
-        let teamword = words.find((x) => 
-            potentialTeamSearch.includes(x) || potentialTeamSearchShort.includes(x)
-        )
-
-        if (potentialTeamSearch.indexOf(teamword) !== -1) teampick = potentialTeamSearch.indexOf(teamword)
-        if (potentialTeamSearchShort.indexOf(teamword) !== -1) teampick = potentialTeamSearchShort.indexOf(teamword)
-
-        let chosenMap = maps.indexOf(words.find(x => maps.includes(x)))
-        let isBan = words.find(x => banWords.includes(x)) ? true : false
-        if (!isBan && !words.find(x => pickWords.includes(x))) {
-            console.error(`Mapline ${id} is neither a pick nor a ban`)
-            invalid = true
-        }
-
-        var sidePick;
-        if (!isBan && teampick !== 2) {
-            sidePick = words.find(x => atkWords.includes(x)) ? 0 : 1
-            if (sidePick === 1 && words.find(x => defWords.includes(x)) == undefined) {
-                console.error(`Mapline ${id} doesn't have a side selected`)
-                invalid = true
-            }
-        } else {
-            sidePick = -1
-        }
-        
-
-
-        if (!invalid) {
-            console.log(
-                `teampick: ${teampick} ${teams[teampick]}\n
-                chosenMap: ${chosenMap} ${maps[chosenMap]}\n
-                isBan: ${isBan}\n
-                sidePick: ${sidePick} ${sides[sidePick]}`
-            )
-
-            mapOrder.push({
-                map: chosenMap,
-                isBan: isBan,
-                teamPick: teampick,
-                sidePick: sidePick
-            })
-
-            if (id+1 == mapPicks.length) {
-                if (mapOrder.find(x => x.teamPick == 2)) {
-                    console.log("directing...")
-                    res.redirect('/')
-                } else {
-                    console.log('adding autoban')
-                    let mapsAdded = mapOrder.map(x => x.map)
-                    let difference = maps.filter(x => !mapsAdded.includes(maps.indexOf(x)));
-                    mapOrder.push({
-                        map: maps.indexOf(difference[0]),
-                        isBan: true,
-                        teamPick: 2,
-                        sidePick: -1,
-                    })
-
-                    console.log(mapOrder)
-                    res.redirect('/')
-                }
-            }
-        } else {
-            res.redirect('/error')
-        }
-    }
-
-
-})
-
-app.get('/submitteams', (req, res) => {
-    req.query.useVOTColours ? otherSettings.useVOTColours = true : otherSettings.useVOTColours = false
-    req.query.teama != "" ? teams[0] = req.query.teama : null
-    req.query.teamb != "" ? teams[1] = req.query.teamb : null
-    req.query.teamaShort != "" ? teamShorts[0] = req.query.teamaShort : null
-    req.query.teambShort != "" ? teamShorts[1] = req.query.teambShort : null
-    console.log(req.query)
-    console.log(teams, otherSettings)
-    res.redirect('/')
-})
-
 app.listen(port, () => {
-  console.log(`Overlay app listening at http://localhost:${port}`)
+    console.log(`Overlay app listening at http://localhost:${port}`)
 })
+
+export default { app }

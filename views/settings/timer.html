@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>settings</title>
+    <style>
+        body {
+            font-family: "Poppins", sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: row;
+            height: 100vh;
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+            background-color: lightgrey;
+        }
+
+        #maps {
+            display: flex;
+            flex-direction: column;
+            padding-left: 20px;
+            border-left-color: black;
+            border-left-width: 3px;
+            border-left-style: solid;
+        }
+
+        #teams {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mapSelect {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .inner {
+            max-height: 500px;
+            display: flex;
+            flex-direction: column;
+            background-color: white;
+            padding: 50px;
+            box-shadow: 13px 13px 40px 5px rgba(0, 0, 0, 0.75);
+            transition: 0.3s all;
+            min-width: 400px;
+        }
+
+        .grow {
+            flex-grow: 1;
+        }
+
+        input[type="submit"] {
+            height: 50px;
+            margin-top: 10px;
+        }
+
+        textarea {
+            min-height: 200px;
+        }
+
+        button {
+            margin-top: 5px;
+        }
+
+        a {
+            min-height: 25px;
+            text-decoration: none;
+            font-size: 0.8em;
+            text-align: center;
+            line-height: 2em;
+            color: white;
+            transition: 0.3s all;
+        }
+
+        .row {
+            display: flex;
+            flex-direction: row;
+        }
+
+        label {
+            margin-right: 30px;
+        }
+
+        .inner h2 {
+            margin: 0;
+            padding: 0;
+        }
+
+        a {
+          min-height: 25px;
+          padding: 50px;
+          background-color: black;
+          padding-top: 10px;
+          padding-bottom: 10px;
+          text-decoration: none;
+          font-size: 0.8em;
+          text-align: center;
+          line-height: 2em;
+          color: white;
+          transition: 0.3s all;
+      }
+
+      a:hover {
+        background-color: grey;
+      }
+    </style>
+</head>
+
+<body>
+    <div class="outer">
+        <div class="inner">
+            <div class="mapSelect">
+                <a href="/">BACK</a>
+                <div class="grow"></div>
+            </div>
+            <h2>timer</h2>
+            <form action="/submittimer" id="teams">
+                <div class="row">
+                    <label for="minutes">minutes:</label>
+                    <div class="grow"></div>
+                    <input type="number" name="minutes" placeholder="<%= minutes %>" >
+                </div>
+                <div class="row">
+                    <label for="seconds">seconds:</label>
+                    <div class="grow"></div>
+                    <input type="number" name="seconds" placeholder="<%= seconds %>" >
+                </div>
+                <div class="row">
+                    <label for="reset">reset:</label>
+                    <div class="grow"></div>
+                    <input type="checkbox" name="reset">
+                </div>
+                <input type="submit" value="submit">
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

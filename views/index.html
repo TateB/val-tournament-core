@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>settings</title>
+  <style>
+      body {
+          font-family: "Poppins", sans-serif;
+          margin:0;
+          padding:0;
+          display: flex;
+          flex-direction: row;
+          height: 100vh;
+          width: 100%;
+          justify-content: center;
+          align-items: center;
+          background-color: lightgrey;
+      }
+      #maps {
+          display: flex;
+          flex-direction: column;
+          padding-left: 20px;
+          border-left-color: black;
+          border-left-width: 3px;
+          border-left-style: solid;
+      }
+
+      #teams {
+          display: flex;
+          flex-direction: column;
+      }
+
+      .mapSelect {
+          display: flex;
+          flex-direction: row;
+      }
+
+      .inner {
+          max-height: 500px;
+          display: flex;
+          flex-direction: column;
+          background-color: white;
+          padding: 50px;
+          box-shadow: 13px 13px 40px 5px rgba(0,0,0,0.75);
+          transition: 0.3s all;
+      }
+      .grow {
+          flex-grow: 1;
+      }
+
+      input[type="submit"] {
+          height: 50px;
+          margin-top: 10px;
+      }
+
+      textarea {
+          min-height: 200px;
+      }
+      button {
+          margin-top: 5px;
+      }
+      a {
+          min-height: 25px;
+          text-decoration: none;
+          font-size: 0.8em;
+          text-align: center;
+          line-height: 2em;
+          color: white;
+          transition: 0.3s all;
+      }
+
+      .row {
+          display: flex;
+          flex-direction: row;
+      }
+
+      label {
+          margin-right: 30px;
+      }
+
+      .inner h2 {
+          margin:0;
+          padding:0;
+      }
+
+
+      
+
+      .inner.button {
+          display: flex;
+          flex-direction: row;
+          height: 50px;
+          color: black;
+          padding: 0px;
+          padding-left: 75px;
+          padding-right: 75px;
+          margin-top: 20px;
+      }
+
+      .inner.button:hover {
+        box-shadow: 5px 5px 40px 0px rgba(0,0,0,0.75);
+      }
+
+
+  </style>
+</head>
+<body>
+    <div class="outer">
+        <div class="inner">
+            <h2>teams</h2>
+            <form action="/submitteams" id="teams">
+                <div class="row">
+                    <label for="teama">team a</label>
+                    <input type="text" name="teama" placeholder="<%= teams[0] %>"/>
+                    <input type="text" name="teamaShort" placeholder="<%= teamShorts[0] %>" >
+                </div>
+                <div class="row">
+                    <label for="teamb">team b</label>
+                    <input type="text" name="teamb" placeholder="<%= teams[1] %>"/>
+                    <input type="text" name="teambShort" placeholder="<%= teamShorts[1] %>" >
+                </div>
+                <input type="submit" value="submit">
+            </form>
+        </div>
+        <a href="/mapbans">
+            <div class="inner button">
+                <p>map bans</p>
+                <div class="grow"></div>
+                <p>></p>
+            </div>
+        </a>
+        <a href="/scoreoverlay">
+            <div class="inner button">
+                <p>score overlay</p>
+                <div class="grow"></div>
+                <p>></p>
+            </div>
+        </a>
+        <a href="/timer">
+            <div class="inner button">
+                <p>timer</p>
+                <div class="grow"></div>
+                <p>></p>
+            </div>
+        </a>
+        <a href="/generalsettings">
+            <div class="inner button">
+                <p>general settings</p>
+                <div class="grow"></div>
+                <p>></p>
+            </div>
+        </a>
+    </div>
+</body>
+</html>

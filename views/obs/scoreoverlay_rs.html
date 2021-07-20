@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .cls-2,
+        .cls-3 {
+            color: #fff;
+            font-family: Poppins-Regular, Poppins;
+            font-weight: 400;
+        }
+
+        .cls-3 {
+            font-size: 45px;
+            line-height: 60px;
+            text-align: right;
+        }
+
+        body {
+            width: 100%;
+            align-items: flex-end;
+            display: flex;
+            flex-direction: row;
+        }
+
+        .col {
+            display: flex;
+            flex-direction: column;
+        }
+        .grow {
+            flex-grow: 1;
+        }
+
+        .scores {
+            justify-content: center;
+            align-items: center;
+            margin-left: 30px;
+            text-align: center;
+        }
+    </style>
+    <script>
+        setInterval(() => {
+            fetch('/scoreoverlay/live').then((res) => {
+                return res.json()
+            }).then((json) => {
+                let { scoreOverlay } = json
+                document.getElementById("teama").innerHTML = scoreOverlay.scores[0]
+                document.getElementById("teamb").innerHTML = scoreOverlay.scores[1]
+            })
+        }, 1000)
+    </script>
+</head>
+
+<body>
+    <div class="grow"></div>
+    <div class="col">
+        <p class="cls-3"><%= teams[0].toUpperCase() %></p>
+        <p class="cls-3"><%= teams[1].toUpperCase() %></p>
+    </div>
+    <div class="col scores">
+        <p class="cls-3" id="teama"><%= scoreOverlay.scores[0] %></p>
+        <p class="cls-3" id="teamb"><%= scoreOverlay.scores[1] %></p>
+    </div>
+</body>
+
+</html>
