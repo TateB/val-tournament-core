@@ -1,16 +1,34 @@
-# Mapbans overlay
-## For valorant map bans
+# Valorant Stream Overlay
+## For valorant map bans, a timer, score overlays, and more
 
-Valorant map bans overlay, uses VOT/LPL colours, but can be customised to whatever you want.
+Valorant stream overlay, uses VOT/LPL colours, but can be customised to whatever you want.
 
-### Now features: veto reading
-Copy and paste the veto log directly into the webpage, and the veto will automatically set everything up for you.
-Manual edit mode is still available, but will only need to be used when there is some sort of error in how the veto is read.
-FYI: Typing auto as the team who banned a map will make it an "autoban map" and it won't be prominently displayed on the screen.
+## Features
+
+### Timer
+Pretty simple timer, for throwing on stream when you are at a break or starting soon.
+
+### Map Bans
+Shows map bans in a pretty cool manner, can also show autobans, and does all from a Bo1 to a Bo5. 
+All it takes is copy pasting your veto log into the settings for it to auto configure itself (in the chance that it doesn't, you can still fix things manually).
+
+### Score overlay 
+A score overlay for while you are in game, uses team names and scores.
+There are 4 options for a score overlay: 
+`charselect/obs`, for in character select screen, (no actual scores) just puts team names up the top of the screen.
+`scoreoverlay/obs`, for an actual in game score overlay.
+`scoreoverlay/obs_vs`, for a "Team A VS Team B" at a starting screen
+`scoreoverlay/obs_rs`, for a multi row score overlay if you're not in game, but in a break or something like that.
+
+### General Settings
+You have the ability to choose uppercase or lowercase characters (depending on stream aesthetic), as well as choosing the VOT/LPL colour scheme.
+Upcoming is a custom colour chooser, the forms are there but it's not yet implemented so don't try to use it.
 
 ### Keep in mind this project is a WIP, and not finished yet.
 You will probably encounter bugs. Lol.
 
+
+### Map Bans Screenshots
 Four bans (Bo1):
 ![Four Bans Example](example_images/4bans.png)
 
@@ -20,22 +38,45 @@ Two bans (Bo3):
 No bans (Bo5):
 ![No Bans Example](example_images/nobans.png)
 
-requires nodejs to run
+This application requires NodeJS to run
 
-how to install:
+How to install:
 ```
 npm install
 ```
-to install requirements
+to install all the dependencies.
 
-how to run
+How to run:
 ```
 node index
 ```
-default port is 3000, but you can change this in the code
-https://localhost:3000 to visit the settings page
+This command should run everything smoothly but be sure to check the logs in case there are errors.
 
-https://localhost:3000/obs for the OBS browser source,
-make sure the viewport is set to 1500x720 as well.
+The default port is set to 3000, but this can be changed.
+http://localhost:3000 to visit the settings page.
+
+
+### OBS Viewports
+#### Map Bans
+`http://localhost:3000/mapbans/obs` 
+Resolution: 1500x720
+
+#### Score Overlays
+`http://localhost:3000/scoreoverlay/obs`
+Main Score Overlay, Resolution: 1920x1080
+
+`http://localhost:3000/scoreoverlay/obs_vs`
+VS Team Name Overlay, Resolution: Any
+
+`http://localhost:3000/scoreoverlay/obs_rs`
+Break/Not In-Game Score Overlay, Resolution: Any
+
+`http://localhost:3000/charselect/obs`
+Character Select Team Name Overlay, Resolution: 1920x1080
+
+#### Timer Overlay
+`http://localhost:3000/timer/obs`
+Resolution: Any
+
 
 
