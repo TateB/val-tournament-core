@@ -18,8 +18,8 @@ db.data ||= {
         "sides": ["attack", "defense"],
     },
     "info": {
-        "teams": ["Pigeon Esports", "Dire Wolves", "auto"],
-        "teamShorts": ["PIG", "DW", "AUTO"],
+        "teams": ["Team A", "Team B", "auto"],
+        "teamShorts": ["TMA", "TMB", "AUTO"],
     }, 
     "mapbans": {
         "mapOrder": [
