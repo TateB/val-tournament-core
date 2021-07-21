@@ -104,6 +104,32 @@
 
 
   </style>
+  <script>
+      var startTimer;
+      function setTimer() {
+        startTimer = setInterval(realTimer, 1000)
+      }
+      var ogSeconds = 180
+
+      function realTimer() {
+            if (ogSeconds < 0) {
+                console.log(0)
+                clearInterval(startTimer)
+                return
+            }
+            let now = new Date().getTime()
+            let countDownTo = now + ogSeconds * 1000
+            let distance = countDownTo - now
+
+            var minutesCd = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
+            minutesCd < 10 ? minutesCd = "0" + minutesCd : null
+            var secondsCd = Math.floor((distance % (1000 * 60)) / 1000)
+            secondsCd < 10 ? secondsCd = "0" + secondsCd : null
+            document.getElementById("seconds").innerHTML = minutesCd + ":" + secondsCd
+            ogSeconds -= 1
+      }
+      
+  </script>
 </head>
 <body>
     <div class="outer">
@@ -149,6 +175,13 @@
                 <p>general settings</p>
                 <div class="grow"></div>
                 <p>></p>
+            </div>
+        </a>
+        <a href="#" onclick="setTimer()">
+            <div class="inner button timer">
+                <p>delay timer</p>
+                <div class="grow"></div>
+                <p id="seconds">03:00</p>
             </div>
         </a>
     </div>
