@@ -85,7 +85,7 @@ let submitPredResult = async (req, res) => {
         db.data.predictions.submitting = true
         await db.write()
         res.redirect('/')
-        await new Promise(r => setTimeout(r, 10000));
+        await new Promise(r => setTimeout(r, 180000)); // wait 3 minutes before sending (stream delay)
     }
 
     await fetch('https://api.twitch.tv/helix/predictions', 
