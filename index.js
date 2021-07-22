@@ -18,11 +18,13 @@ import mb from "./apps/mapbans.js"
 import settings from "./apps/settings.js"
 import scoreoverlay from "./apps/scoreoverlay.js"
 import timer from "./apps/timer.js"
+import predictions from "./apps/predictions.js"
 
 mb.forward(app)
 settings.forward(app)
 scoreoverlay.forward(app)
 timer.forward(app)
+predictions.forward(app)
 
 app.get('/error', (req, res) => {
     res.render('error', {

@@ -16,17 +16,20 @@ let realsettings = async (req, res) => {
     const info = db.data.info
     const mapbans = db.data.mapbans
     const generalSettings = db.data.generalSettings
+    const twitch = db.data.twitch
 
     const { mapOrder, showBans, showAutobans } = mapbans 
     const { teams, teamShorts } = info 
     const { maps, sides } = gameInfo
     const { isLowerCase, useVOTColours, customColour } = generalSettings
+    const { clientId } = twitch
 
     res.render('settings/realsettings', {
         options: maps,
         maps: mapOrder,
         teams: teams,
         teamShorts: teamShorts,
+        clientId: clientId,
         otherSettings: {
             isLowerCase: isLowerCase,
             useVOTColours: useVOTColours,
@@ -69,11 +72,16 @@ let mainpage = async (req, res) => {
     const { teams, teamShorts } = info 
     const { maps, sides } = gameInfo
     const { isLowerCase, useVOTColours, customColour } = generalSettings
+    const { currentPredicting, submitting, predictionsShowing } = db.data.predictions
 
     res.render('index', {
         options: maps,
         maps: mapOrder,
         teams: teams,
+        predictableMaps: mapOrder.filter(x => !x.isBan),
+        predOn: currentPredicting,
+        predSubmitting: submitting,
+        predictionsShowing: predictionsShowing,
         teamShorts: teamShorts,
         otherSettings: {
             isLowerCase: isLowerCase,

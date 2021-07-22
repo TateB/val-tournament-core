@@ -91,22 +91,26 @@
         }
 
         a {
-          min-height: 25px;
-          padding: 50px;
-          background-color: black;
-          padding-top: 10px;
-          padding-bottom: 10px;
-          text-decoration: none;
-          font-size: 0.8em;
-          text-align: center;
-          line-height: 2em;
-          color: white;
-          transition: 0.3s all;
-      }
+            min-height: 25px;
+            padding: 50px;
+            background-color: black;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            text-decoration: none;
+            font-size: 0.8em;
+            text-align: center;
+            line-height: 2em;
+            color: white;
+            transition: 0.3s all;
+        }
 
-      a:hover {
-        background-color: grey;
-      }
+        a:hover {
+            background-color: grey;
+        }
+
+        .twitch {
+            margin-top: 10px;
+        }
     </style>
 </head>
 
@@ -122,20 +126,22 @@
                 <div class="row">
                     <label for="useVOTColours">use VOT colours:</label>
                     <div class="grow"></div>
-                    <input type="checkbox" name="useVOTColours" <%= otherSettings.useVOTColours ? "checked" : "" %> >
+                    <input type="checkbox" name="useVOTColours" <%=otherSettings.useVOTColours ? "checked" : "" %> >
                 </div>
                 <div class="row">
                     <label for="isLowerCase">use lowercase letters:</label>
                     <div class="grow"></div>
-                    <input type="checkbox" name="isLowerCase" <%= otherSettings.isLowerCase ? "checked" : "" %> >
+                    <input type="checkbox" name="isLowerCase" <%=otherSettings.isLowerCase ? "checked" : "" %> >
                 </div>
                 <div class="row">
                     <label for="useCustomColour">custom colour (if not using VOT):</label>
                     <div class="grow"></div>
-                    <input type="text" name="customColour" placeholder="<%= otherSettings.customColour %>" >
+                    <input type="text" name="customColour" placeholder="<%= otherSettings.customColour %>">
                 </div>
                 <input type="submit" value="submit">
             </form>
+            <a href="https://id.twitch.tv/oauth2/authorize?client_id=<%= clientId %>&redirect_uri=http://localhost&response_type=token&scope=channel:manage:predictions%20channel:edit:commercial"
+                class="twitch">login with twitch</a>
         </div>
     </div>
 </body>

@@ -47,6 +47,18 @@ db.data ||= {
         "customColour": "",
         "isLowerCase": false,
     },
+    "twitch" : {
+        "clientId" : "",
+        "clientSecret": "",
+        "channelAccessToken": "",
+        "userId": "",
+    },
+    "predictions": {
+        "currentPredicting": false,
+        "predId": "",
+        "teamIds": [],
+        "predictionsShowing": false,
+    }
  }
 
  await db.write()

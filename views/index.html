@@ -102,7 +102,23 @@
         box-shadow: 5px 5px 40px 0px rgba(0,0,0,0.75);
       }
 
+      .pred {
+          height: 25px !important;
+          margin-top: 0 !important;
+      }
 
+      .predtwo {
+          height: 25px !important;
+          margin-top: 20px !important;
+      }
+
+      .first {
+          margin-bottom: 25px;
+      }
+
+      .predButton {
+          width: 100%;
+      }
   </style>
   <script>
       var startTimer;
@@ -133,7 +149,7 @@
 </head>
 <body>
     <div class="outer">
-        <div class="inner">
+        <div class="inner first">
             <h2>teams</h2>
             <form action="/submitteams" id="teams">
                 <div class="row">
@@ -148,6 +164,58 @@
                 </div>
                 <input type="submit" value="submit">
             </form>
+        </div>
+        <div class="inner">
+            <form action="/submitprediction">
+                <div class="row">
+                    <h2>submit prediction (twitch key required)</h2>
+                </div>
+                <% if (!predOn && !predSubmitting) { %>
+                <div class="row">
+                    <select name="mapSelect">
+                        <%  for(let [index, map] of Object.entries(predictableMaps)) { %>
+                        <option value="<%= index %>"><%= options[map.map] %></option>
+                        <% } %>
+                    </select>
+                    <div class="grow"></div>
+                    <input type="submit" class="pred" value="submit prediction">
+                </div>
+                <% } else if (predSubmitting) { %>
+                <script>
+                    setInterval(() => {
+                        fetch('/checksubmit').then(res => res.json())
+                        .then((json) => {
+                            if (!json.submitting) location.reload()
+                        })
+                    }, 1000)
+                </script>
+                <p>please wait before the prediction to submit before you submit another</p>
+                <% } else { %>
+                <div class="row">
+                    <label for="teamSelect">winning team</label>
+                    <div class="grow"></div>
+                    <select name="teamSelect">
+                        <option value="0"><%= teams[0] %></option>
+                        <option value="1"><%= teams[1] %></option>
+                    </select>
+                </div>
+                <div class="row">
+                    <label for="keepDelay">keep stream delay (3mins)</label>
+                    <div class="grow"></div>
+                    <input type="checkbox" name="keepDelay" checked />
+                </div>
+                <input type="submit" class="predtwo" formaction="/predresult" value="submit prediction result">
+                <% } %>
+            </form>
+            <% if (predOn) { %>
+            <form action="/showobs">
+                <% if (predictionsShowing) { %>
+                <input type="submit" value="hide predictions (obs)" class="predButton" >
+                <% } else { %>
+                <input type="submit" value="show predictions (obs)" class="predButton" >
+                <% } %>
+            </form>
+            <% } %>
         </div>
         <a href="/mapbans">
             <div class="inner button">
