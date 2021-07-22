@@ -207,7 +207,7 @@
                 <input type="submit" class="predtwo" formaction="/predresult" value="submit prediction result">
                 <% } %>
             </form>
-            <% if (predOn) { %>
+            <% if (predOn && !predSubmitting) { %>
             <form action="/showobs">
                 <% if (predictionsShowing) { %>
                 <input type="submit" value="hide predictions (obs)" class="predButton" >
