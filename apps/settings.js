@@ -1,4 +1,5 @@
 import db from "../db.mjs"
+import nightbot from "../extensions/nightbot.js"
 
 function forward(app) {
     db.read().then(() => {
@@ -6,6 +7,7 @@ function forward(app) {
         app.get('/submitteams', (req,res) => submitteams(req,res))
         app.get('/generalsettings', (req,res) => realsettings(req,res))
         app.get('/submitsettings', (req, res) => submitsettings(req,res))
+        app.get('/nightbot/login', (req, res) => nightbotLogin(req, res))
     })
     
 }
@@ -17,6 +19,7 @@ let realsettings = async (req, res) => {
     const mapbans = db.data.mapbans
     const generalSettings = db.data.generalSettings
     const twitch = db.data.twitch
+    const nightbot = db.data.nightbot
 
     const { mapOrder, showBans, showAutobans } = mapbans 
     const { teams, teamShorts } = info 
@@ -24,12 +27,16 @@ let realsettings = async (req, res) => {
     const { isLowerCase, useVOTColours, customColour } = generalSettings
     const { clientId } = twitch
 
+    var nbExpiry;
+    nightbot.user.expiry ? nbExpiry = nightbot.user.expiry : nbExpiry = false
+
     res.render('settings/realsettings', {
         options: maps,
         maps: mapOrder,
         teams: teams,
         teamShorts: teamShorts,
         clientId: clientId,
+        nightbotExpiry: nbExpiry,
         otherSettings: {
             isLowerCase: isLowerCase,
             useVOTColours: useVOTColours,
@@ -108,6 +115,30 @@ let submitteams = async (req, res) => {
     await db.write()
     console.log("written")
     res.redirect('/')
+}
+
+let nightbotLogin = async (req, res) => {
+    await db.read()
+    const nightbotData = db.data.nightbot
+    let finalURL = `https://api.nightbot.tv/oauth2/authorize?response_type=token&client_id=${nightbotData.clientId}&redirect_uri=https://localhost:3500&scope=commands%20commands_default`
+
+    res.redirect(finalURL)
+
+    let nbRes = await nightbot.retrieveNightbotToken()
+    
+    console.log("full response received: ", nbRes)
+    if (nbRes.access_token != undefined) {
+        console.log("looking good")
+        db.data.nightbot.user = {
+            accessToken: nbRes.access_token,
+            expiry: Date.now() + (parseInt(nbRes.expires_in) * 1000)
+        }
+    } else {
+        console.log("there was an error retrieving token")
+        return
+    }
+
+    await db.write()
 }
 
 export default { forward }

@@ -1,6 +1,5 @@
 import express from "express"
 import path from "path"
-import db from "./db.mjs"
 import { renderFile } from "ejs"
 import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);

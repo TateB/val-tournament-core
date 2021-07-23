@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>redirecting...</title>
+        <script>
+            let hash = window.location.hash
+            let newHash = hash.substring(1)
+            console.log(newHash)
+            fetch("/hash?" + newHash)
+            .then(() => {
+                window.location.replace("http://localhost:3000/generalsettings")
+            })
+        </script>
+    </head>
+    <body>
+        <h1>Redirecting...</h1>
+    </body>
+</html>

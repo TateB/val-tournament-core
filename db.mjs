@@ -58,6 +58,12 @@ db.data ||= {
         "predId": "",
         "teamIds": [],
         "predictionsShowing": false,
+    },
+    "nightbot": {
+        "clientId": "",
+        "clientSecret": "",
+        "user": {},
+        "commands": {},
     }
  }
 

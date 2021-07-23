@@ -1,4 +1,5 @@
 import db from "../db.mjs"
+import nightbot from "../extensions/nightbot.js"
 
 function forward(app) {
     app.get('/mapbans/manualinput', (req, res) => manualinput(req,res))
@@ -80,6 +81,8 @@ let submitmaps = async (req, res) => {
         "isShowing": x.isShowing == "on" ? true : false,
     })
     db.data.mapbans.mapOrder = mapOrder
+
+    sendToNightbot(mapOrder, teamShorts, maps)
     db.write()
 
     res.redirect('/');
@@ -155,8 +158,11 @@ let submitmapsbeta = async (req, res) => {
 
             if (id + 1 == mapPicks.length) {
                 if (mapOrder.find(x => x.teamPick == 2)) {
-                    console.log("directing...")
-                    res.redirect('/')
+                    // Autoban already added
+                    db.data.mapbans.mapOrder = mapOrder
+                    sendToNightbot(mapOrder, teamShorts, maps)
+                    db.write()
+                    res.redirect('/mapbans')
                 } else {
                     console.log('adding autoban')
                     let mapsAdded = mapOrder.map(x => x.map)
@@ -169,8 +175,9 @@ let submitmapsbeta = async (req, res) => {
                     })
 
                     db.data.mapbans.mapOrder = mapOrder
+
+                    sendToNightbot(mapOrder, teamShorts, maps)
                     db.write()
-                    console.log(mapOrder)
                     res.redirect('/mapbans')
                 }
             }
@@ -180,6 +187,23 @@ let submitmapsbeta = async (req, res) => {
     }
 
 
+}
+
+function sendToNightbot(mapOrder, teamShorts, maps) {
+    const nbData = db.data.nightbot
+    let pickedMaps = mapOrder.filter(x => !x.isBan)
+    var nbMsg = ""
+    let atkSrts = ["ATK", "DEF"]
+    for (let [i, pmap] of Object.entries(pickedMaps)) {
+        let oppTeam = teamShorts[pmap.teamPick ? 0 : 1]
+        // E.g. "TMA pick HAVEN (TMB ATK),"
+        nbMsg += `${teamShorts[pmap.teamPick]} pick ${maps[pmap.map].toUpperCase()} (${oppTeam} ${atkSrts[pmap.sidePick]})` 
+        if (i != pickedMaps.length -1) {
+            nbMsg += ", "
+        }
+    }
+
+    nightbot.setCommand(nbData.commands.maps, nbMsg, nbData.user.accessToken)
 }
 
 let obs = async (req, res) => {

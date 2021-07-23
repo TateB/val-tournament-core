@@ -1,4 +1,5 @@
 import db from "../db.mjs"
+import nightbot from "../extensions/nightbot.js"
 
 function forward(app) {
     db.read().then(() => {
@@ -29,6 +30,7 @@ let scoreoverlay = async (req, res) => {
 let submitscores = async (req, res) => {
     await db.read()
     var scoreOverlay = db.data.scoreOverlay
+    const teams = db.data.info.teams
     let q = req.query
 
     q.teama ? scoreOverlay.scores[0] = parseInt(q.teama) : null
@@ -37,6 +39,15 @@ let submitscores = async (req, res) => {
     q.reverse ? scoreOverlay.reversed = true : scoreOverlay.reversed = false
 
     db.data.scoreOverlay = scoreOverlay
+
+    const nbData = db.data.nightbot
+    if (nbData.commands.scores) { // set nightbot command
+        await nightbot.setCommand(
+            nbData.commands.scores, 
+            `${teams[0]} (${scoreOverlay.scores[0]}) - (${scoreOverlay.scores[1]}) ${teams[1]}`,
+            nbData.user.accessToken
+            )
+    }
 
     console.log(q)
     console.log(scoreOverlay)

@@ -142,6 +142,11 @@
             </form>
             <a href="https://id.twitch.tv/oauth2/authorize?client_id=<%= clientId %>&redirect_uri=http://localhost&response_type=token&scope=channel:manage:predictions%20channel:edit:commercial"
                 class="twitch">login with twitch</a>
+            <% if (nightbotExpiry) { %>
+            <p>nightbot token expires in <%= ((nightbotExpiry - Date.now())/(1000 * 60 * 60 * 24)).toFixed(0) %> days</p>
+            <% } else { %>
+            <a href="/nightbot/login" class="twitch">login with nightbot</a>
+            <% } %>
         </div>
     </div>
 </body>
