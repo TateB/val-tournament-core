@@ -47,7 +47,7 @@ function setCommand(command, content, userId) {
     console.log("got set command req for", command)
     return new Promise((resolve, reject) => {
         let sendBody = {
-            message: content
+            message: "@$(user), " + content
         }
     
         fetch("https://api.nightbot.tv/1/commands/" + command, {
