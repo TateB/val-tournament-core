@@ -79,8 +79,8 @@
                     let tAPoints = json.outcomes[0].channel_points
                     let tBPoints = json.outcomes[1].channel_points
                     let total = tAPoints + tBPoints
-                    let percents = [(tAPoints / total) == NaN ? (tAPoints / total) * 100 : 0, (tBPoints / total) == NaN ? (tBPoints / total) * 100 : 0]
-
+                    let percents = [isNaN(tAPoints / total) ? 0 : (tAPoints / total) * 100, isNaN(tBPoints / total) ? 0 : (tBPoints / total) * 100]
+                    
                     els.forEach((e, i) => {
                         let outcomeData = json.outcomes[i]
                         document.querySelector(e + " #percent").innerHTML = percents[i].toFixed(0) + "%"
