@@ -62,11 +62,13 @@ let obs = async (req, res) => {
     const teamShorts = db.data.info.teamShorts
     const scoreOverlay = db.data.scoreOverlay
     const useVOTColours = db.data.generalSettings.useVOTColours
+    const iconLinks = db.data.info.iconLinks
 
     res.render('obs/scoreoverlay', {
         teamShorts: teamShorts,
         scoreOverlay: scoreOverlay,
-        useVOTColours: useVOTColours
+        useVOTColours: useVOTColours,
+        iconLinks: iconLinks,
     })
 }
 
@@ -74,10 +76,12 @@ let obsVS = async (req, res) => {
     await db.read()
     const teams = db.data.info.teams
     const iconLinks = db.data.info.iconLinks
+    const otherSettings = db.data.generalSettings
 
     res.render('obs/scoreoverlay_VS', {
         teams: teams,
         iconLinks, iconLinks,
+        otherSettings: otherSettings,
     })
 }
 
@@ -85,10 +89,12 @@ let obsRS = async (req, res) => {
     await db.read()
     const teams = db.data.info.teams
     const scoreOverlay = db.data.scoreOverlay
+    const iconLinks = db.data.info.iconLinks
 
     res.render('obs/scoreoverlay_rs', {
         teams: teams,
         scoreOverlay: scoreOverlay,
+        iconLinks: iconLinks,
     })
 }
 
@@ -98,12 +104,14 @@ let obsCharSelect = async (req, res) => {
     const teams = db.data.info.teams
     const scoreOverlay = db.data.scoreOverlay
     const useVOTColours = db.data.generalSettings.useVOTColours
+    const iconLinks = db.data.info.iconLinks
 
     res.render('obs/charselectteams', {
         teamShorts: teamShorts,
         scoreOverlay: scoreOverlay,
         useVOTColours: useVOTColours,
         teams: teams,
+        iconLinks: iconLinks,
     })
 }
 

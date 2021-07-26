@@ -2,7 +2,22 @@
 <html>
 
 <head>
+    <% if (otherSettings.useVOTColours) { %>
     <style>
+        :root {
+            --accent-color: #ff4654;
+        }
+    </style>
+    <% } else { %>
+    <style>
+        :root {
+            --accent-color: #A800FF;
+        }
+    </style>
+    <% } %>
+    <style>
+        
+
         * {
             margin: 0;
             padding: 0;
@@ -22,15 +37,19 @@
         }
 
         .icons {
+            margin-top: 10px;
             margin-left: 20px;
-            height: 210px;
+            height: 195px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
         }
         .icons img {
-            width: 50px;
+            width: 35px;
+            height: 35px;
             padding: 10px;
+            background-color: rgb(51, 51, 51);
+            border-radius: 15px;
         }
 
         body {

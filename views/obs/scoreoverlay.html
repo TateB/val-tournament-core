@@ -36,6 +36,15 @@
             })
         }, 1000)
     </script>
+    <style>
+        .inSvg {
+            height: 30px;
+            width: 30px;
+            padding: 5px;
+            background-color: #000;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 
 <body>
@@ -74,6 +83,12 @@
         <text id="leftTeam" class="cls-3 leftteam" text-anchor="end" transform="translate(908 124)"><%= scoreOverlay.reversed ? teamShorts[1] : teamShorts[0] %></text>
         <text id="leftScore" class="cls-3" text-anchor="middle" transform="translate(865 85.43)"><%= scoreOverlay.reversed ? scoreOverlay.scores[1] : scoreOverlay.scores[0] %></text>
         <text id="rightScore" class="cls-3" text-anchor="middle" transform="translate(1055 85.43)"><%= scoreOverlay.reversed ? scoreOverlay.scores[0] : scoreOverlay.scores[1] %></text>
+        <foreignObject width="40" height="40" x="1090" y="89">
+            <img class="inSvg" src="<%= scoreOverlay.reversed ? iconLinks[0] : iconLinks[1] %>" xmlns="http://www.w3.org/1999/xhtml" />
+        </foreignObject>
+        <foreignObject width="40" height="40" x="790" y="89">
+            <img class="inSvg" src="<%= scoreOverlay.reversed ? iconLinks[1] : iconLinks[0] %>" xmlns="http://www.w3.org/1999/xhtml" />
+        </foreignObject>
     </svg>
 </body>
 
