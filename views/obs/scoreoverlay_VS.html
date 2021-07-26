@@ -20,13 +20,41 @@
             line-height: 70px;
             text-align: right;
         }
+
+        .icons {
+            margin-left: 20px;
+            height: 210px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .icons img {
+            width: 50px;
+            padding: 10px;
+        }
+
+        body {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .grow {
+            flex-grow: 1;
+        }
     </style>
 </head>
 
 <body>
-    <p class="cls-3"><%= teams[0].toUpperCase() %></p>
-    <p class="cls-3">VS</p>
-    <p class="cls-3"><%= teams[1].toUpperCase() %></p>
+    <div class="grow"></div>
+    <div class="maintext">
+        <p class="cls-3"><%= teams[0].toUpperCase() %></p>
+        <p class="cls-3">VS</p>
+        <p class="cls-3"><%= teams[1].toUpperCase() %></p>
+    </div>
+    <div class="icons">
+        <img src="<%= iconLinks[0] %>" />
+        <img src="<%= iconLinks[1] %>" />
+    </div>
 </body>
 
 </html>

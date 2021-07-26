@@ -20,6 +20,7 @@ db.data ||= {
     "info": {
         "teams": ["Team A", "Team B", "auto"],
         "teamShorts": ["TMA", "TMB", "AUTO"],
+        "iconLinks": [],
     }, 
     "mapbans": {
         "mapOrder": [

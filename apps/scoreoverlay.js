@@ -69,12 +69,15 @@ let obs = async (req, res) => {
         useVOTColours: useVOTColours
     })
 }
+
 let obsVS = async (req, res) => {
     await db.read()
     const teams = db.data.info.teams
+    const iconLinks = db.data.info.iconLinks
 
     res.render('obs/scoreoverlay_VS', {
         teams: teams,
+        iconLinks, iconLinks,
     })
 }
 

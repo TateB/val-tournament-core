@@ -1,5 +1,7 @@
+import fetch from "node-fetch"
 import db from "../db.mjs"
 import nightbot from "../extensions/nightbot.js"
+import urlExist from "url-exist"
 
 function forward(app) {
     db.read().then(() => {
@@ -10,6 +12,20 @@ function forward(app) {
         app.get('/nightbot/login', (req, res) => nightbotLogin(req, res))
     })
     
+}
+
+function logoURL(name) {
+    return new Promise((resolve, reject) => {
+        urlExist(`https://raw.githubusercontent.com/lootmarket/esport-team-logos/master/valorant/${name}/${name}-logo.png?raw=true`)
+        .then((result) => {
+            console.log(name, result)
+            if (result) {
+                resolve(`https://raw.githubusercontent.com/lootmarket/esport-team-logos/master/valorant/${name}/${name}-logo.png?raw=true`)
+            } else {
+                resolve("/icons/default.png")
+            }
+        })
+    })
 }
 
 let realsettings = async (req, res) => {
@@ -102,7 +118,6 @@ let submitteams = async (req, res) => {
     await db.read()
     let info = db.data.info
     var { teams, teamShorts } = info 
-    console.log(db.data)
     let q = req.query
 
     q.teama != "" ? teams[0] = q.teama : null
@@ -110,7 +125,16 @@ let submitteams = async (req, res) => {
     q.teamaShort != "" ? teamShorts[0] = q.teamaShort : null
     q.teambShort != "" ? teamShorts[1] = q.teambShort : null
 
-    db.data.info = { teams, teamShorts }
+    let formattedTeamA = teams[0].replace(/\s+/g, '-').toLowerCase()
+    let formattedTeamB = teams[1].replace(/\s+/g, '-').toLowerCase()
+    let iconLinks = [
+        await logoURL(formattedTeamA),
+        await logoURL(formattedTeamB)
+    ]
+
+    
+
+    db.data.info = { teams, teamShorts, iconLinks }
 
     await db.write()
     console.log("written")
