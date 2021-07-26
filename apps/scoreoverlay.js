@@ -38,7 +38,7 @@ let submitscores = async (req, res) => {
     q.mapsToWin ? scoreOverlay.mapsToWin = parseInt(q.mapsToWin) : null
     q.reverse ? scoreOverlay.reversed = true : scoreOverlay.reversed = false
 
-    db.data.scoreOverlay = scoreOverlay
+    
 
     const nbData = db.data.nightbot
     if (nbData.commands.scores) { // set nightbot command
@@ -48,6 +48,8 @@ let submitscores = async (req, res) => {
             nbData.user.accessToken
             )
     }
+
+    db.data.scoreOverlay = scoreOverlay
 
     console.log(q)
     console.log(scoreOverlay)
