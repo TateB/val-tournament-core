@@ -1,0 +1,83 @@
+import {
+  Table,
+  Heading,
+  Strong,
+  Tablist,
+  Tab,
+  Combobox,
+  Text,
+} from "evergreen-ui"
+import { useState, Fragment } from "react"
+
+function Preview() {
+  const [tabs] = useState([
+    "Map 1",
+    "Map 2",
+    "Map 3",
+    "Map 4",
+    "Map 5",
+    "Map 6",
+  ])
+
+  const [mapPicks] = useState([
+    {
+      map: "Ascent",
+      pickBan: "Ban",
+      chosenBy: "Team A",
+      oppositionStart: "None",
+    },
+    {
+      map: "Icebox",
+      pickBan: "Ban",
+      chosenBy: "Team A",
+      oppositionStart: "None",
+    },
+    {
+      map: "Breeze",
+      pickBan: "Pick",
+      chosenBy: "Team B",
+      oppositionStart: "Defence",
+    },
+    {
+      map: "Bind",
+      pickBan: "Pick",
+      chosenBy: "Team B",
+      oppositionStart: "Attack",
+    },
+    {
+      map: "Haven",
+      pickBan: "Pick",
+      chosenBy: "Team B",
+      oppositionStart: "Defence",
+    },
+    { map: "Split", pickBan: "Ban", chosenBy: "Auto", oppositionStart: "None" },
+  ])
+
+  return (
+    <Table flexGrow="1" width="100%" marginLeft={32}>
+      <Table.Head>
+        <Table.TextHeaderCell>Map Name</Table.TextHeaderCell>
+        <Table.TextHeaderCell>Pick/Ban</Table.TextHeaderCell>
+        <Table.TextHeaderCell>Team</Table.TextHeaderCell>
+        <Table.TextHeaderCell>Starting Side</Table.TextHeaderCell>
+      </Table.Head>
+      <Table.Body height={240}>
+        {mapPicks.map((map) => (
+          <Table.Row
+            height={40}
+            key={map.map}
+            isSelectable
+            onSelect={() => alert(map.map)}
+          >
+            <Table.TextCell>{map.map}</Table.TextCell>
+            <Table.TextCell>{map.pickBan}</Table.TextCell>
+            <Table.TextCell>{map.chosenBy}</Table.TextCell>
+            <Table.TextCell>{map.oppositionStart}</Table.TextCell>
+          </Table.Row>
+        ))}
+      </Table.Body>
+    </Table>
+  )
+}
+
+export default Preview
