@@ -1,8 +1,17 @@
-import { Pane, Text } from "evergreen-ui"
+import { Pane, Text, TextInput, Button, Select } from "evergreen-ui"
 import { Component } from "react"
 import Layout from "./etc/Layout"
+import States from "./Predictions/States"
 
 class Predictions extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      pickedMaps: ["Ascent", "Haven", "Icebox"],
+      cState: 1,
+    }
+  }
+
   render() {
     return (
       <Layout
@@ -10,16 +19,7 @@ class Predictions extends Component {
         openAppCallback={this.props.openAppCallback}
         openedApp={this.props.openedApp}
       >
-        <Pane>
-          <Text>
-            Eos ea sunt velit sint et voluptatem eius dolor. Aut voluptatem non
-            ducimus dolorem. Inventore consequatur ratione aliquam molestias
-            provident est aperiam. Mollitia qui libero quas perspiciatis. Dicta
-            at nam voluptas et. Vero illo nihil numquam culpa est minima eaque
-            quia. Nisi fugiat rerum modi aut. Delectus repellendus nihil
-            tempore.
-          </Text>
-        </Pane>
+        <States cState={this.state.cState} />
       </Layout>
     )
   }

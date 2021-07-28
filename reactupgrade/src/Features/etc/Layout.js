@@ -56,7 +56,16 @@ class Layout extends Component {
           height={this.state.bodyShowing ? "auto" : 0}
           style={{ width: "100%" }}
         >
-          <Pane paddingTop="25px">{this.props.children}</Pane>
+          <Pane paddingTop="20px">
+            <hr
+              style={{
+                backgroundColor: "lightgrey",
+                border: "none",
+                height: "1px",
+              }}
+            />
+            {this.props.children}
+          </Pane>
         </AnimateHeight>
       </Pane>
     )

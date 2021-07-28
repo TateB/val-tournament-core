@@ -1,24 +1,7 @@
-import {
-  Table,
-  Heading,
-  Strong,
-  Tablist,
-  Tab,
-  Combobox,
-  Text,
-} from "evergreen-ui"
-import { useState, Fragment } from "react"
+import { Table } from "evergreen-ui"
+import { useState } from "react"
 
 function Preview() {
-  const [tabs] = useState([
-    "Map 1",
-    "Map 2",
-    "Map 3",
-    "Map 4",
-    "Map 5",
-    "Map 6",
-  ])
-
   const [mapPicks] = useState([
     {
       map: "Ascent",
