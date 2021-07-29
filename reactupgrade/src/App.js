@@ -1,45 +1,43 @@
 import "./App.css"
 import features from "./Features/etc/Features"
 import { Pane } from "evergreen-ui"
-import { Component } from "react"
+import { Component, useState, useEffect } from "react"
+import { checkForOAuth } from "./apis/apis"
 
-class App extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      appOpen: "Teams",
-    }
+const App = () => {
+  const [appOpen, setAppOpen] = useState("Teams")
+
+  const openApp = (newApp) => {
+    setAppOpen(newApp)
   }
 
-  openApp = (newApp) => {
-    this.setState({ appOpen: newApp })
-  }
+  useEffect(() => {
+    checkForOAuth()
+  }, [])
 
-  render() {
-    return (
-      <Pane
-        height="100vh"
-        width="100%"
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        justifyContent="space-around"
-        paddingTop="10%"
-        paddingBottom="10%"
-      >
-        {features.map(function (feature) {
-          return (
-            <feature.element
-              key={feature.name}
-              name={feature.name}
-              openAppCallback={this.openApp}
-              openedApp={this.state.appOpen}
-            />
-          )
-        }, this)}
-      </Pane>
-    )
-  }
+  return (
+    <Pane
+      height="100vh"
+      width="100%"
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="space-around"
+      paddingTop="10%"
+      paddingBottom="10%"
+    >
+      {features.map(function (feature) {
+        return (
+          <feature.element
+            key={feature.name}
+            name={feature.name}
+            openAppCallback={openApp}
+            openedApp={appOpen}
+          />
+        )
+      })}
+    </Pane>
+  )
 }
 
 export default App

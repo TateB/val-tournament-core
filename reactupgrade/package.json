@@ -9,6 +9,7 @@
     "dexie": "^3.2.0-beta-2",
     "dexie-react-hooks": "^1.0.7",
     "evergreen-ui": "^6.2.0",
+    "idtoken-verifier": "^2.2.0",
     "react": "^17.0.2",
     "react-animate-height": "^2.0.23",
     "react-color": "^2.19.3",

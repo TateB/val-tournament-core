@@ -6,19 +6,18 @@ import {
   Button,
   TextInputField,
 } from "evergreen-ui"
-import { Component, useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import { BlockPicker } from "react-color"
 import Layout from "./etc/Layout"
-import { useLiveQuery } from "dexie-react-hooks"
 import db from "../db/db"
+import resetSettings from "../db/resetToDefault"
 
 function Settings(props) {
   const [settings, setSettings] = useState({
-    useVOTColours: true,
+    streamDelay: 180,
   })
 
   useEffect(() => {
-    console.log("running effect")
     db.settings.get("general").then((res) => {
       setSettings(res.settings)
     })
@@ -38,6 +37,20 @@ function Settings(props) {
       prevSettings["customColour"] = colour.hex
       return prevSettings
     })
+  }
+
+  const submitToDb = () => {
+    db.settings.update("general", { settings: settings })
+  }
+
+  const resetToDefault = () => {
+    resetSettings("general")
+      .then(() => {
+        return db.settings.get("general")
+      })
+      .then((res) => {
+        setSettings(res.settings)
+      })
   }
 
   return (
@@ -120,8 +133,12 @@ function Settings(props) {
           onChange={(e) => setValue("streamDelay", e.target.value)}
         />
         <Pane display="flex" flexDirection="row" justifyContent="space-between">
-          <Button intent="success">Submit</Button>
-          <Button intent="danger">Reset to Defaults</Button>
+          <Button intent="success" onClick={submitToDb}>
+            Submit
+          </Button>
+          <Button intent="danger" onClick={resetToDefault}>
+            Reset to Defaults
+          </Button>
         </Pane>
       </Pane>
     </Layout>
