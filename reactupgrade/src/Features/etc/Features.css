@@ -1,0 +1,7 @@
+.colorButton {
+  transition: all 0.15s;
+}
+
+.colorButton:hover {
+  filter: grayscale(0.2);
+}
