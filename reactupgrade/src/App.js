@@ -3,6 +3,7 @@ import features from "./Features/etc/Features"
 import { Pane } from "evergreen-ui"
 import { Component, useState, useEffect } from "react"
 import { checkForOAuth } from "./apis/apis"
+import { connect } from "./webrtc/connect"
 
 const App = () => {
   const [appOpen, setAppOpen] = useState("Teams")
@@ -13,6 +14,7 @@ const App = () => {
 
   useEffect(() => {
     checkForOAuth()
+    connect()
   }, [])
 
   return (

@@ -1,4 +1,5 @@
 import db from "./db"
+import { v4 as uuidv4 } from "uuid"
 
 const makeDefaults = async () => {
   await db.maps.bulkPut([
@@ -15,17 +16,23 @@ const makeDefaults = async () => {
     { id: 2, name: "none" },
   ])
   await db.mapbans.bulkPut([
-    { id: 0, map: 0, isBan: true, teamPick: 0, sidePick: 2, isShowing: true },
-    { id: 1, map: 1, isBan: true, teamPick: 1, sidePick: 2, isShowing: true },
-    { id: 2, map: 2, isBan: false, teamPick: 0, sidePick: 0, isShowing: true },
-    { id: 3, map: 3, isBan: false, teamPick: 1, sidePick: 1, isShowing: true },
-    { id: 4, map: 4, isBan: false, teamPick: 0, sidePick: 1, isShowing: true },
-    { id: 5, map: 5, isBan: true, teamPick: 2, sidePick: 2, isShowing: true },
+    { id: 0, map: 0, isBan: 1, teamPick: 0, sidePick: 2, isShowing: true },
+    { id: 1, map: 1, isBan: 1, teamPick: 1, sidePick: 2, isShowing: true },
+    { id: 2, map: 2, isBan: 0, teamPick: 0, sidePick: 0, isShowing: true },
+    { id: 3, map: 3, isBan: 0, teamPick: 1, sidePick: 1, isShowing: true },
+    { id: 4, map: 4, isBan: 0, teamPick: 0, sidePick: 1, isShowing: true },
+    { id: 5, map: 5, isBan: 1, teamPick: 2, sidePick: 2, isShowing: true },
   ])
   await db.teams.bulkPut([
-    { id: 0, name: "Team A", short: "TEMA", iconLink: "", score: 0 },
-    { id: 1, name: "Team B", short: "TEMB", iconLink: "", score: 0 },
-    { id: 2, name: "Auto", short: "AUTO", iconLink: "", score: 0 },
+    { id: 0, name: "Team A", short: "TEMA", iconLink: "", score: [0, 0, 0] },
+    {
+      id: 1,
+      name: "Team Potent",
+      short: "TEMB",
+      iconLink: "",
+      score: [0, 0, 0],
+    },
+    { id: 2, name: "Auto", short: "AUTO", iconLink: "", score: [0, 0, 0] },
   ])
   await db.settings.bulkPut([
     {
@@ -50,6 +57,8 @@ const makeDefaults = async () => {
         customColour: "",
         isLowerCase: false,
         nightbotDelay: true,
+        useCustomIcon: false,
+        customIcon: "",
       },
     },
     {
@@ -65,6 +74,12 @@ const makeDefaults = async () => {
       name: "nightbot",
       settings: {
         commands: {},
+      },
+    },
+    {
+      name: "webrtc",
+      settings: {
+        roomID: "12b5e63a-5630-458f-80c7-be3dce3ec6eb", // SHOULD BE: uuidv4(),
       },
     },
   ])

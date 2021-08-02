@@ -26,6 +26,8 @@ const resetSettings = async (setting) => {
           customColour: "",
           isLowerCase: false,
           nightbotDelay: true,
+          useCustomIcon: false,
+          customIcon: "",
         },
       })
       return
