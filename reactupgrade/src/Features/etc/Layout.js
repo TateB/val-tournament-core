@@ -35,6 +35,7 @@ class Layout extends Component {
         elevation={this.state.bodyShowing ? 2 : 1}
         width={1000}
         padding={20}
+        marginY={16}
         background={this.state.bodyShowing ? "tint1" : ""}
       >
         <Pane

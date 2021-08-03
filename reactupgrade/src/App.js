@@ -4,6 +4,8 @@ import { Pane } from "evergreen-ui"
 import { Component, useState, useEffect } from "react"
 import { checkForOAuth } from "./apis/apis"
 import { connect } from "./webrtc/connect"
+import db from "./db/db"
+import makeDefaults from "./db/makeDefaults"
 
 const App = () => {
   const [appOpen, setAppOpen] = useState("Teams")
@@ -15,18 +17,20 @@ const App = () => {
   useEffect(() => {
     checkForOAuth()
     connect()
+    db.on("populate", makeDefaults)
+    db.teams.get(0)
   }, [])
 
   return (
     <Pane
-      height="100vh"
+      minHeight="100vh"
       width="100%"
       display="flex"
       flexDirection="column"
       alignItems="center"
       justifyContent="space-around"
-      paddingTop="10%"
-      paddingBottom="10%"
+      paddingTop="10vh"
+      paddingBottom="10vh"
     >
       {features.map(function (feature) {
         return (

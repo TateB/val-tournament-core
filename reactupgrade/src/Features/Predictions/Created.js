@@ -1,11 +1,17 @@
 import { useState, Fragment } from "react"
 import { Pane, Button, SelectField, Checkbox, TextInput } from "evergreen-ui"
+import { twitch } from "../../apis/apis"
 
-function Created() {
+function Created(props) {
   const [pickedMap] = useState("Ascent")
   const [teams] = useState(["Team A", "Team B"])
   const [scores] = useState([0, 0])
   const [checked, setChecked] = useState(true)
+
+  const submitCancel = () => {
+    props.setLoading(true)
+    twitch.cancelPrediction().then(() => props.setLoading(false))
+  }
 
   return (
     <Fragment>
@@ -47,7 +53,9 @@ function Created() {
       <Pane display="flex" flexDirection="row" marginTop={8}>
         <Button intent="success">Submit</Button>
         <Pane flexGrow="1"></Pane>
-        <Button intent="danger">Cancel Prediction</Button>
+        <Button intent="danger" onClick={submitCancel}>
+          Cancel Prediction
+        </Button>
       </Pane>
     </Fragment>
   )

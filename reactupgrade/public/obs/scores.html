@@ -6,8 +6,6 @@
         margin: 0;
         padding: 0;
       }
-    </style>
-    <style>
       :root {
         --colour-scheme: #fd4453;
       }
@@ -16,7 +14,6 @@
         fill: var(--colour-scheme);
       }
     </style>
-
     <script type="text/javascript" src="simplepeer.min.js"></script>
     <script type="text/javascript" src="obs.js"></script>
     <script>
@@ -29,11 +26,12 @@
           "--colour-scheme",
           genset.useVOTColours ? "#fd4453" : genset.customColour
         )
-        console.log(newVal)
         document.getElementById("bestOf").innerHTML =
           "BO" + teams[0].score.length
-        document.getElementById("rightTeam").innerHTML = finalTeam[1].short
-        document.getElementById("leftTeam").innerHTML = finalTeam[0].short
+        document.getElementById("rightTeam").innerHTML =
+          finalTeam[1].short.toUpperCase()
+        document.getElementById("leftTeam").innerHTML =
+          finalTeam[0].short.toUpperCase()
         document.getElementById("rightScore").innerHTML = finalTeam[1].maps
         document.getElementById("leftScore").innerHTML = finalTeam[0].maps
         document.getElementById("rightLogo").src = finalTeam[1].iconLink

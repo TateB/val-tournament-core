@@ -7,9 +7,19 @@ import {
   Combobox,
   Text,
 } from "evergreen-ui"
-import { useState, Fragment } from "react"
+import { useState, Fragment, useEffect, useRef, useCallback } from "react"
 
-function ManualInput() {
+function usePrevious(value) {
+  const ref = useRef()
+  useEffect(() => {
+    ref.current = value
+  })
+  return ref.current
+}
+
+const capitalize = (s) => (s && s[0].toUpperCase() + s.slice(1)) || ""
+
+function ManualInput(props) {
   const [tabs] = useState([
     "Map 1",
     "Map 2",
@@ -19,7 +29,7 @@ function ManualInput() {
     "Map 6",
   ])
 
-  const [dropOptions] = useState([
+  const [dropOptions, setDropOptions] = useState([
     {
       name: "Map",
       options: [
@@ -37,7 +47,7 @@ function ManualInput() {
     },
     {
       name: "Ban/Pick",
-      options: [{ label: "Ban" }, { label: "Pick" }],
+      options: [{ label: "Pick" }, { label: "Ban" }],
     },
     {
       name: "Side",
@@ -46,6 +56,43 @@ function ManualInput() {
   ])
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [isShown, setIsShown] = useState(false)
+  const [formattedMapBans, setFMB] = useState([])
+  const prevMB = usePrevious(formattedMapBans)
+
+  useEffect(() => {
+    setDropOptions((prevState) => {
+      var prevSettings = [...prevState]
+      prevSettings[1].options = [
+        { label: props.teams[0].name },
+        { label: props.teams[1].name },
+        { label: "Auto" },
+      ]
+      prevSettings[0].options = props.maps.map((m) => ({
+        label: capitalize(m.name),
+        id: m.id,
+      }))
+      return prevSettings
+    })
+    setFMB(props.mapBans.map((m) => [m.map, m.teamPick, m.isBan, m.sidePick]))
+  }, [props, props.setMapBans])
+
+  if (formattedMapBans.length === 0) return null
+
+  const setExMapBans = (mapInx, keyInx, newVal) => {
+    props.setMapBans((prevState) => {
+      const relayArray = ["map", "teamPick", "isBan", "sidePick"]
+      var prevMapBans = [...prevState]
+      prevMapBans[mapInx][relayArray[keyInx]] = newVal
+      if (keyInx === 0) {
+        prevMapBans[prevMB.findIndex((x) => x[0] === newVal)].map =
+          prevMB[mapInx][0]
+        return prevMapBans
+      } else {
+        return prevMapBans
+      }
+    })
+  }
+
   return (
     <Fragment>
       <SideSheet isShown={isShown} onCloseComplete={() => setIsShown(false)}>
@@ -108,10 +155,18 @@ function ManualInput() {
                       {drop.name}
                     </Text>
                     <Combobox
-                      initialSelectedItem={drop.options[0]}
+                      selectedItem={drop.options[formattedMapBans[index][inx]]}
                       items={drop.options}
                       itemToString={(item) => (item ? item.label : "")}
-                      onChange={(selected) => console.log(selected)}
+                      onChange={(selected) =>
+                        setExMapBans(
+                          index,
+                          inx,
+                          dropOptions[inx].options.findIndex(
+                            (x) => x === selected
+                          )
+                        )
+                      }
                     />
                   </Pane>
                 ))}

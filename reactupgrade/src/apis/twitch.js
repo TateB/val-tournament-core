@@ -118,6 +118,143 @@ const generateLoginLink = () => {
   })
 }
 
-const allFunctions = { authCheck, generateLoginLink, revalidateToken, logout }
+function isAuthed(settings) {
+  return new Promise((resolve, reject) => {
+    if (settings.authenticated) {
+      return resolve()
+    } else {
+      return reject("Not authenticated with Twitch")
+    }
+  })
+}
+
+function checkForErrors(res) {
+  return new Promise((resolve, reject) => {
+    switch (res.status) {
+      case 200:
+        return resolve(res.json())
+      case 400:
+        return reject("Request was invalid")
+      case 401:
+        return reject("Authorisation failed")
+      default:
+        return reject("Error: " + res.statusText)
+    }
+  })
+}
+
+const submitPrediction = (selected, predLength) => {
+  var map, teams, twitch
+  return db.maps
+    .toArray((arr) => {
+      return (map = arr[selected])
+    })
+    .then(() => db.teams.bulkGet([0, 1]))
+    .then((arr) => (teams = arr))
+    .then(() => db.userSessions.get("twitch"))
+    .then((obj) => (twitch = obj))
+    .then(() => isAuthed(twitch))
+    .then(() => db.mapbans.where("id").equals(selected).toArray())
+    .then((arr) => {
+      const selectedMapInfo = arr[0]
+      const mapName = map.name
+      const teamShort = teams[selectedMapInfo.teamPick].short
+      const title = `WHO TAKES ${mapName.toUpperCase()}? (${teamShort.toUpperCase()} PICK)`
+      const sendBody = {
+        broadcaster_id: twitch.session.userId,
+        title: title,
+        outcomes: [
+          {
+            title: teams[0].name.toUpperCase(),
+          },
+          {
+            title: teams[1].name.toUpperCase(),
+          },
+        ],
+        prediction_window: predLength,
+      }
+      return sendBody
+    })
+    .then((sendBody) =>
+      fetch("https://api.twitch.tv/helix/predictions", {
+        method: "POST",
+        body: JSON.stringify(sendBody),
+        headers: {
+          Authorization: "Bearer " + twitch.session.accessToken,
+          "Client-Id": process.env.REACT_APP_TWITCH_KEY,
+          "Content-Type": "application/json",
+        },
+      })
+    )
+    .then((res) => {
+      return res.json()
+    })
+    .then((json) =>
+      db.settings.update("predictions", {
+        settings: {
+          available: true,
+          id: json.data[0].id,
+          teamIds: [json.data[0].outcomes[0].id, json.data[0].outcomes[1].id],
+          predictionLength: predLength,
+          showing: false,
+          willSend: false,
+        },
+      })
+    )
+    .catch((err) => console.error(err))
+}
+
+const cancelPrediction = () => {
+  var twitch, predSet
+  return db.userSessions
+    .get("twitch")
+    .then((obj) => (twitch = obj))
+    .then(() => db.settings.get("predictions"))
+    .then((obj) => (predSet = obj.settings))
+    .then(() => isAuthed(twitch))
+    .then(() => ({
+      broadcaster_id: twitch.session.userId,
+      id: predSet.id,
+      status: "CANCELED",
+    }))
+    .then((sendBody) =>
+      fetch("https://api.twitch.tv/helix/predictions", {
+        method: "PATCH",
+        body: JSON.stringify(sendBody),
+        headers: {
+          Authorization: "Bearer " + twitch.session.accessToken,
+          "Client-Id": process.env.REACT_APP_TWITCH_KEY,
+          "Content-Type": "application/json",
+        },
+      })
+    )
+    .then((res) => checkForErrors(res))
+    .then(() =>
+      db.settings.update("predictions", {
+        settings: {
+          available: false,
+          id: "",
+          teamIds: [],
+          predictionLength: predSet.predictionLength,
+          showing: false,
+          willSend: false,
+        },
+      })
+    )
+    .catch((err) => console.error(err))
+}
+
+const submitPredictionResult = () => {}
+
+const fetchPredictions = () => {}
+
+const allFunctions = {
+  authCheck,
+  generateLoginLink,
+  revalidateToken,
+  logout,
+  submitPrediction,
+  cancelPrediction,
+}
 
 export default allFunctions

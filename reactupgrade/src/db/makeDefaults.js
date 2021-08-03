@@ -68,6 +68,8 @@ const makeDefaults = async () => {
         id: "",
         teamIds: [],
         showing: false,
+        predictionLength: 300,
+        willSend: false,
       },
     },
     {
@@ -81,6 +83,10 @@ const makeDefaults = async () => {
       settings: {
         roomID: "12b5e63a-5630-458f-80c7-be3dce3ec6eb", // SHOULD BE: uuidv4(),
       },
+    },
+    {
+      name: "twitch",
+      settings: {},
     },
   ])
   await db.userSessions.bulkPut([

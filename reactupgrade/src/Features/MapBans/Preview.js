@@ -1,8 +1,10 @@
 import { Table } from "evergreen-ui"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
-function Preview() {
-  const [mapPicks] = useState([
+const capitalize = (s) => (s && s[0].toUpperCase() + s.slice(1)) || ""
+
+function Preview(props) {
+  const [mapPicks, setMapPicks] = useState([
     {
       map: "Ascent",
       pickBan: "Ban",
@@ -36,6 +38,19 @@ function Preview() {
     { map: "Split", pickBan: "Ban", chosenBy: "Auto", oppositionStart: "None" },
   ])
 
+  useEffect(() => {
+    setMapPicks(
+      props.mapBans.map((m) => ({
+        map: props.maps[m.map].name,
+        pickBan: m.isBan === 0 ? "Pick" : "Ban",
+        chosenBy: m.teamPick === 2 ? "Auto" : props.teams[m.teamPick].name,
+        oppositionStart: ["Attack", "Defence", "None"][m.sidePick],
+      }))
+    )
+  }, [props])
+
+  if (props.teams[0] === undefined) return null
+
   return (
     <Table flexGrow="1" width="100%" marginLeft={32}>
       <Table.Head>
@@ -46,13 +61,8 @@ function Preview() {
       </Table.Head>
       <Table.Body height={240}>
         {mapPicks.map((map) => (
-          <Table.Row
-            height={40}
-            key={map.map}
-            isSelectable
-            onSelect={() => alert(map.map)}
-          >
-            <Table.TextCell>{map.map}</Table.TextCell>
+          <Table.Row height={40} key={map.map}>
+            <Table.TextCell>{capitalize(map.map)}</Table.TextCell>
             <Table.TextCell>{map.pickBan}</Table.TextCell>
             <Table.TextCell>{map.chosenBy}</Table.TextCell>
             <Table.TextCell>{map.oppositionStart}</Table.TextCell>

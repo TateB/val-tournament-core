@@ -7,7 +7,7 @@ import { useLiveQuery } from "dexie-react-hooks"
 // TEAMS: Best Of Number, Maps Wins, Team Shorts, Team Names, iconLink, scoreArray,
 // SETTINGS: reversed, useVOTColours, useCustomIcon
 
-export function sendScores(teams, settings) {
+export function sendScores(teams, settings, protocol = "") {
   function readFile(file) {
     return new Promise((resolve, reject) => {
       var fr = new FileReader()
@@ -92,13 +92,121 @@ export function sendScores(teams, settings) {
         .then((newlink) => (teams[1].iconLink = newlink))
         .then(() =>
           connections
-            .filter(
-              (x) =>
-                x.protocol.split("_")[0] === "scores" && x.connected === true
+            .filter((x) =>
+              protocol === ""
+                ? x.protocol.split("_")[0] === "scores" && x.connected === true
+                : x.protocol === protocol
             )
-            .map((x) =>
-              x.peer.send(JSON.stringify({ teams, genset, settings }))
-            )
+            .map((x) => {
+              console.log("mapping for send")
+              console.log(x)
+              return x.peer.send(JSON.stringify({ teams, genset, settings }))
+            })
         )
     })
+}
+
+export function setNewTeams(teams) {
+  db.settings.get("scores").then((scset) => sendScores(teams, scset.settings))
+}
+
+export function sendTimer(settings) {
+  return connections
+    .find((x) => x.protocol === "timer")
+    .peer.send(JSON.stringify(settings))
+}
+
+export function sendTimerStart() {
+  return connections
+    .find((x) => x.protocol === "timer")
+    .peer.send(JSON.stringify({ start: true }))
+}
+
+export function sendTimerStop() {
+  return connections
+    .find((x) => x.protocol === "timer")
+    .peer.send(JSON.stringify({ stop: true }))
+}
+
+export function sendTimerReset() {
+  return connections
+    .find((x) => x.protocol === "timer")
+    .peer.send(JSON.stringify({ reset: true }))
+}
+
+export function sendMapBans() {
+  var teams, genset, mapbans, maps, sides
+  return db.mapbans
+    .toArray()
+    .then((arr) => (mapbans = arr))
+    .then(() => db.teams.toArray())
+    .then((arr) => (teams = arr))
+    .then(() => db.settings.get("general"))
+    .then((arr) => (genset = arr))
+    .then(() => db.maps.toArray())
+    .then((arr) => arr.map((x) => x.name))
+    .then((arr) => (maps = arr))
+    .then(() => db.sides.toArray())
+    .then((arr) => arr.map((x) => x.name))
+    .then((arr) => (sides = arr))
+    .then(() => connections.find((x) => x.protocol === "mapbans"))
+    .then((conn) =>
+      conn.peer.send(JSON.stringify({ teams, mapbans, genset, maps, sides }))
+    )
+    .catch(() => console.error("couldn't send to peer"))
+}
+
+export function initialSend(protocol) {
+  switch (protocol) {
+    case "mapbans":
+      sendMapBans()
+      break
+    case "predictions":
+      break
+    case "scores":
+      var teams
+      var settings
+      db.teams
+        .bulkGet([0, 1])
+        .then((array) => (teams = array))
+        .then(() => db.settings.get("scores"))
+        .then((obj) => (settings = obj.settings))
+        .then(() => sendScores(teams, settings, protocol))
+      break
+    case "scores_start":
+      var teams
+      var settings
+      db.teams
+        .bulkGet([0, 1])
+        .then((array) => (teams = array))
+        .then(() => db.settings.get("scores"))
+        .then((obj) => (settings = obj.settings))
+        .then(() => sendScores(teams, settings, protocol))
+      break
+    case "scores_break":
+      var teams
+      var settings
+      db.teams
+        .bulkGet([0, 1])
+        .then((array) => (teams = array))
+        .then(() => db.settings.get("scores"))
+        .then((obj) => (settings = obj.settings))
+        .then(() => sendScores(teams, settings, protocol))
+      break
+    case "scores_characterselect":
+      var teams
+      var settings
+      db.teams
+        .bulkGet([0, 1])
+        .then((array) => (teams = array))
+        .then(() => db.settings.get("scores"))
+        .then((obj) => (settings = obj.settings))
+        .then(() => sendScores(teams, settings, protocol))
+      break
+    case "timer":
+      db.settings.get("timer").then((obj) => sendTimer(obj.settings))
+      break
+    default:
+      break
+  }
 }

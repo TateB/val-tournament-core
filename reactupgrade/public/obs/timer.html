@@ -1,18 +1,90 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <script type="text/javascript" src="simplepeer.min.js"></script>
-  <script type="text/javascript" src="obs.js"></script>
-  <script>
-      function onDataChange() {
-          console.log("data changed")
+  <head>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
       }
-  </script>
-</head>
-<body>
-  <div class="container">
-    <h1>Recieved text:</h1>
-    <div id="inside"></div>
-  </div>
-</body>
+
+      .cls-2,
+      .cls-3 {
+        color: #fff;
+        font-family: Poppins-Medium, Poppins;
+        font-weight: 500;
+      }
+
+      .cls-3 {
+        font-size: 50px;
+      }
+    </style>
+    <script type="text/javascript" src="simplepeer.min.js"></script>
+    <script type="text/javascript" src="obs.js"></script>
+    <script>
+      var seconds = 0
+      var currentSeconds = 0
+      var intervalFunc
+      recievedData.registerListener((newVal) => {
+        if (seconds === 0) {
+          seconds = newVal.seconds
+          currentSeconds = seconds
+        }
+        if (newVal.seconds) {
+          seconds = newVal.seconds
+        }
+        if (newVal.reset) {
+          currentSeconds = seconds
+        }
+        if (newVal.start) {
+          intervalFunc = setInterval(() => {
+            if (currentSeconds < 0) return
+            renderTime(currentSeconds)
+            currentSeconds -= 1
+          }, 1000)
+        }
+        if (newVal.stop) {
+          clearInterval(intervalFunc)
+        }
+      })
+
+      function renderTime(secs) {
+        let now = new Date().getTime()
+        let countDownTo = now + secs * 1000
+        let distance = countDownTo - now
+
+        var minutesCd = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
+        minutesCd < 10 ? (minutesCd = "0" + minutesCd) : null
+        var secondsCd = Math.floor((distance % (1000 * 60)) / 1000)
+        secondsCd < 10 ? (secondsCd = "0" + secondsCd) : null
+        document.getElementById("seconds").innerHTML =
+          minutesCd + ":" + secondsCd
+      }
+
+      if (document.visibilityState === "visible") {
+        intervalFunc = setInterval(() => {
+          if (currentSeconds < 0) return
+          renderTime(currentSeconds)
+          currentSeconds -= 1
+        }, 1000)
+      }
+
+      window.addEventListener("obsSourceActiveChanged", (evt) => {
+        console.log(evt.detail.active)
+        if (evt.detail.active) {
+          intervalFunc = setInterval(() => {
+            if (currentSeconds < 0) return
+            renderTime(currentSeconds)
+            currentSeconds -= 1
+          }, 1000)
+        } else {
+          clearInterval(intervalFunc)
+          renderTime(seconds)
+          currentSeconds = seconds
+        }
+      })
+    </script>
+  </head>
+  <body>
+    <p id="seconds" class="cls-3">0:00</p>
+  </body>
+</html>
