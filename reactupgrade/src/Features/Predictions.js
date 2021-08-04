@@ -17,10 +17,15 @@ function Predictions(props) {
   const predSettings = useLiveQuery(() => db.settings.get("predictions"))
   const [loading, setLoading] = useState(false)
 
+  useEffect(() => {
+    setLoading(false)
+  }, [predSettings])
+
   if (
     !pickedMaps ||
     !teams ||
     !maps ||
+    !predSettings ||
     pickedMaps.length === 0 ||
     teams.length === 0 ||
     maps.length === 0
@@ -32,6 +37,7 @@ function Predictions(props) {
       name={props.name}
       openAppCallback={props.openAppCallback}
       openedApp={props.openedApp}
+      protocols={["predictions"]}
     >
       {loading ? (
         <Pane
@@ -51,6 +57,7 @@ function Predictions(props) {
           maps={maps}
           setLoading={setLoading}
           predState={predSettings.settings}
+          loading={loading}
         />
       )}
     </Layout>

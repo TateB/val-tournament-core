@@ -70,6 +70,8 @@ const makeDefaults = async () => {
         showing: false,
         predictionLength: 300,
         willSend: false,
+        forMap: null,
+        results: [],
       },
     },
     {

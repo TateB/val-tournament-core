@@ -130,10 +130,13 @@ function Settings(props) {
             />
             <TextInputField
               width={240}
+              type="number"
               label="Stream Delay (in seconds)"
               required
               value={settings.streamDelay}
-              onChange={(e) => setValue("streamDelay", e.target.value)}
+              onChange={(e) =>
+                setValue("streamDelay", parseInt(e.target.value))
+              }
             />
           </Pane>
           <Pane flexGrow="1">

@@ -60,6 +60,12 @@ function Scores(props) {
       name={props.name}
       openAppCallback={props.openAppCallback}
       openedApp={props.openedApp}
+      protocols={[
+        "scores",
+        "scores_start",
+        "scores_break",
+        "scores_characterselect",
+      ]}
     >
       <Pane display="flex" flexDirection="column">
         {pickedMaps.map((map, inx) => (

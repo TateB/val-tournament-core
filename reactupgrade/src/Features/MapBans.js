@@ -42,6 +42,7 @@ function MapBans(props) {
       name={props.name}
       openAppCallback={props.openAppCallback}
       openedApp={props.openedApp}
+      protocols={["mapbans"]}
     >
       <Pane display="flex" width="100%" flexDirection="column">
         <Pane display="flex" flexDirection="row">

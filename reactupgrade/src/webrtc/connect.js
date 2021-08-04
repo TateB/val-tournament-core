@@ -1,8 +1,49 @@
-import Peer from "simple-peer"
+import Peer, { prototype } from "simple-peer"
 import db from "../db/db"
 import { initialSend } from "./send"
 
-export var connections = []
+class ConnectionArray extends Array {
+  #listeners
+
+  constructor(...items) {
+    super(...items)
+  }
+
+  push(val) {
+    if (val.protocol) {
+      const category = val.protocol.split("_")[0]
+      Array.prototype.push.call(
+        this,
+        new Proxy(val, {
+          set: function (pTarg, pProp, pVal) {
+            console.log("TPV", pTarg, pProp, pVal)
+            if (pProp === "connected") {
+              window.dispatchEvent(
+                new CustomEvent(category, {
+                  detail: {
+                    protocol: pTarg.protocol,
+                    connected: pVal,
+                  },
+                  bubbles: true,
+                })
+              )
+            }
+            pTarg[pProp] = pVal
+            return true
+          },
+        })
+      )
+    } else {
+      Array.prototype.push.call(this, val)
+    }
+  }
+
+  static get [Symbol.species]() {
+    return Array
+  }
+}
+
+export const connections = new ConnectionArray()
 
 export async function connect() {
   const webRTCSettings = await db.settings.get("webrtc")

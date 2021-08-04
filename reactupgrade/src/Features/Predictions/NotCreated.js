@@ -30,9 +30,7 @@ function NotCreated(props) {
 
   const submitToTwitch = () => {
     props.setLoading(true)
-    twitch
-      .submitPrediction(props.pickedMaps[selected].id, predLength)
-      .then(() => props.setLoading(false))
+    twitch.submitPrediction(props.pickedMaps[selected], predLength)
   }
 
   return (
@@ -42,9 +40,16 @@ function NotCreated(props) {
           <SelectField
             label="Map to predict"
             onChange={(event) => setSelected(event.target.value)}
+            id="m2p"
           >
             {props.pickedMaps.map((map, inx) => (
-              <option value={inx}>{props.maps[map.map]}</option>
+              <option
+                style={{ textTransform: "capitalize" }}
+                value={inx}
+                key={inx}
+              >
+                {props.maps[map.map]}
+              </option>
             ))}
           </SelectField>
           <TextInputField

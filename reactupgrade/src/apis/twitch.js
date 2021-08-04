@@ -128,6 +128,25 @@ function isAuthed(settings) {
   })
 }
 
+function standardFetch(accessToken, category, method, body) {
+  var URI = "https://api.twitch.tv/helix/" + category
+  var options = {
+    method: method,
+    headers: {
+      Authorization: "Bearer " + accessToken,
+      "Client-Id": process.env.REACT_APP_TWITCH_KEY,
+    },
+  }
+  if (method === "GET") {
+    URI += "?" + new URLSearchParams(body).toString()
+  } else {
+    options.headers["Content-Type"] = "application/json"
+    options.body = JSON.stringify(body)
+  }
+
+  return fetch(URI, options)
+}
+
 function checkForErrors(res) {
   return new Promise((resolve, reject) => {
     switch (res.status) {
@@ -147,16 +166,15 @@ const submitPrediction = (selected, predLength) => {
   var map, teams, twitch
   return db.maps
     .toArray((arr) => {
-      return (map = arr[selected])
+      return (map = arr[selected.id])
     })
     .then(() => db.teams.bulkGet([0, 1]))
     .then((arr) => (teams = arr))
     .then(() => db.userSessions.get("twitch"))
     .then((obj) => (twitch = obj))
     .then(() => isAuthed(twitch))
-    .then(() => db.mapbans.where("id").equals(selected).toArray())
-    .then((arr) => {
-      const selectedMapInfo = arr[0]
+    .then(() => {
+      const selectedMapInfo = selected
       const mapName = map.name
       const teamShort = teams[selectedMapInfo.teamPick].short
       const title = `WHO TAKES ${mapName.toUpperCase()}? (${teamShort.toUpperCase()} PICK)`
@@ -176,19 +194,9 @@ const submitPrediction = (selected, predLength) => {
       return sendBody
     })
     .then((sendBody) =>
-      fetch("https://api.twitch.tv/helix/predictions", {
-        method: "POST",
-        body: JSON.stringify(sendBody),
-        headers: {
-          Authorization: "Bearer " + twitch.session.accessToken,
-          "Client-Id": process.env.REACT_APP_TWITCH_KEY,
-          "Content-Type": "application/json",
-        },
-      })
+      standardFetch(twitch.session.accessToken, "predictions", "POST", sendBody)
     )
-    .then((res) => {
-      return res.json()
-    })
+    .then((res) => checkForErrors(res))
     .then((json) =>
       db.settings.update("predictions", {
         settings: {
@@ -198,8 +206,18 @@ const submitPrediction = (selected, predLength) => {
           predictionLength: predLength,
           showing: false,
           willSend: false,
+          forMap: selected,
+          results: [],
         },
       })
+    )
+    .then(() =>
+      window.dispatchEvent(
+        new CustomEvent("getPreds", {
+          detail: { predLength: predLength },
+          cancelable: false,
+        })
+      )
     )
     .catch((err) => console.error(err))
 }
@@ -218,15 +236,12 @@ const cancelPrediction = () => {
       status: "CANCELED",
     }))
     .then((sendBody) =>
-      fetch("https://api.twitch.tv/helix/predictions", {
-        method: "PATCH",
-        body: JSON.stringify(sendBody),
-        headers: {
-          Authorization: "Bearer " + twitch.session.accessToken,
-          "Client-Id": process.env.REACT_APP_TWITCH_KEY,
-          "Content-Type": "application/json",
-        },
-      })
+      standardFetch(
+        twitch.session.accessToken,
+        "predictions",
+        "PATCH",
+        sendBody
+      )
     )
     .then((res) => checkForErrors(res))
     .then(() =>
@@ -238,15 +253,84 @@ const cancelPrediction = () => {
           predictionLength: predSet.predictionLength,
           showing: false,
           willSend: false,
+          forMap: null,
+          results: [],
         },
       })
     )
     .catch((err) => console.error(err))
 }
 
-const submitPredictionResult = () => {}
+const submitPredictionResult = (teamInx) => {
+  var twitch, predSet
+  return db.userSessions
+    .get("twitch")
+    .then((obj) => (twitch = obj))
+    .then(() => db.settings.get("predictions"))
+    .then((obj) => (predSet = obj.settings))
+    .then(() => isAuthed(twitch))
+    .then(() => ({
+      broadcaster_id: twitch.session.userId,
+      id: predSet.id,
+      status: "RESOLVED",
+      winning_outcome_id: predSet.teamIds[teamInx],
+    }))
+    .then((sendBody) =>
+      standardFetch(
+        twitch.session.accessToken,
+        "predictions",
+        "PATCH",
+        sendBody
+      )
+    )
+    .then((res) => checkForErrors(res))
+    .then((json) =>
+      db.settings.update("predictions", {
+        settings: {
+          available: false,
+          id: "",
+          teamIds: [],
+          predictionLength: predSet.predictionLength,
+          showing: false,
+          willSend: false,
+          forMap: null,
+          results: [],
+        },
+      })
+    )
+    .catch((err) => console.error(err))
+}
 
-const fetchPredictions = () => {}
+const fetchPredictions = () => {
+  var twitch, predSet, predResV
+  return db.userSessions
+    .get("twitch")
+    .then((obj) => (twitch = obj))
+    .then(() => db.settings.get("predictions"))
+    .then((obj) => (predSet = obj.settings))
+    .then(() => isAuthed(twitch))
+    .then(() => ({
+      broadcaster_id: twitch.session.userId,
+      id: predSet.id,
+    }))
+    .then((sendBody) =>
+      standardFetch(twitch.session.accessToken, "predictions", "GET", sendBody)
+    )
+    .then((res) => checkForErrors(res))
+    .then((json) => json.data[0].outcomes)
+    .then((predRes) => [
+      predRes[0].channel_points + predRes[1].channel_points,
+      predRes,
+    ])
+    .then(([totalPoints, predRes]) =>
+      predRes.map((x) => ({
+        participants: x.users,
+        pointsUsed: x.channel_points,
+        colour: x.color,
+        percent: ((x.channel_points / totalPoints || 0) * 100).toFixed(0),
+      }))
+    )
+}
 
 const allFunctions = {
   authCheck,
@@ -255,6 +339,7 @@ const allFunctions = {
   logout,
   submitPrediction,
   cancelPrediction,
+  fetchPredictions,
 }
 
 export default allFunctions

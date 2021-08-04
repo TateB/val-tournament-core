@@ -49,6 +49,7 @@ function Timer(props) {
       name={props.name}
       openAppCallback={props.openAppCallback}
       openedApp={props.openedApp}
+      protocols={["timer"]}
     >
       <Pane>
         <TextInputField
