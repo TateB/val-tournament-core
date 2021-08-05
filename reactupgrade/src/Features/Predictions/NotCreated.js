@@ -17,11 +17,19 @@ function NotCreated(props) {
   const [predLength, setPredLength] = useState(300)
   const [selectedMap, setSelectedMap] = useState("")
   const [selectedTeam, setSelectedTeam] = useState("")
+  const [unplayedPicks, setUnplayed] = useState(
+    props.pickedMaps.filter((x) => !x.played)
+  )
+
+  useEffect(
+    () => setUnplayed(props.pickedMaps.filter((x) => !x.played)),
+    [props]
+  )
 
   useEffect(() => {
-    setSelectedMap(props.maps[props.pickedMaps[selected].map].toUpperCase())
+    setSelectedMap(props.maps[unplayedPicks[selected].map].toUpperCase())
     setSelectedTeam(
-      props.teams[props.pickedMaps[selected].teamPick].short.toUpperCase()
+      props.teams[unplayedPicks[selected].teamPick].short.toUpperCase()
     )
     db.settings
       .get("predictions")
@@ -30,7 +38,7 @@ function NotCreated(props) {
 
   const submitToTwitch = () => {
     props.setLoading(true)
-    twitch.submitPrediction(props.pickedMaps[selected], predLength)
+    twitch.submitPrediction(unplayedPicks[selected], predLength)
   }
 
   return (
@@ -42,7 +50,7 @@ function NotCreated(props) {
             onChange={(event) => setSelected(event.target.value)}
             id="m2p"
           >
-            {props.pickedMaps.map((map, inx) => (
+            {unplayedPicks.map((map, inx) => (
               <option
                 style={{ textTransform: "capitalize" }}
                 value={inx}

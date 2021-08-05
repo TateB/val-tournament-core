@@ -42,8 +42,6 @@ function Layout(props) {
       : null
   }, [])
 
-  useEffect(() => console.log("IS CONNECTED:", rtcStatus))
-
   const toggleShow = () => props.openAppCallback(props.name)
 
   const calculateItems = () => {

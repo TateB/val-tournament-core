@@ -1,6 +1,6 @@
 import db from "./db"
 
-const resetSettings = async (setting) => {
+export const resetSettings = async (setting) => {
   switch (setting) {
     case "scores":
       await db.settings.update("scores", {
@@ -36,4 +36,15 @@ const resetSettings = async (setting) => {
   }
 }
 
-export default resetSettings
+export const resetMapBans = () => {
+  return db.mapbans.clear().then(() =>
+    db.mapbans.bulkPut([
+      { id: 0, map: 0, isBan: 1, teamPick: 0, sidePick: 2, isShowing: true },
+      { id: 1, map: 1, isBan: 1, teamPick: 1, sidePick: 2, isShowing: true },
+      { id: 2, map: 2, isBan: 0, teamPick: 0, sidePick: 0, isShowing: true },
+      { id: 3, map: 3, isBan: 0, teamPick: 1, sidePick: 1, isShowing: true },
+      { id: 4, map: 4, isBan: 0, teamPick: 0, sidePick: 1, isShowing: true },
+      { id: 5, map: 5, isBan: 1, teamPick: 2, sidePick: 2, isShowing: true },
+    ])
+  )
+}

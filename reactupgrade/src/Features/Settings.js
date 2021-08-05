@@ -11,7 +11,7 @@ import { useState, useEffect } from "react"
 import { BlockPicker } from "react-color"
 import Layout from "./etc/Layout"
 import db from "../db/db"
-import resetSettings from "../db/resetToDefault"
+import { resetSettings } from "../db/resetToDefault"
 
 function Settings(props) {
   const [settings, setSettings] = useState({

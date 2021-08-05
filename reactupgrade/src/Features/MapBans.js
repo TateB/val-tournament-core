@@ -2,6 +2,7 @@ import { useLiveQuery } from "dexie-react-hooks"
 import { Pane, Textarea, Button } from "evergreen-ui"
 import { Component, useEffect, useRef, useState } from "react"
 import db from "../db/db"
+import { resetMapBans } from "../db/resetToDefault"
 import { sendMapBans } from "../webrtc/send"
 import Layout from "./etc/Layout"
 import ManualInput from "./MapBans/ManualInput"
@@ -12,6 +13,7 @@ function MapBans(props) {
   const [dbMapBans, setDbMapBans] = useState([])
   const [mapsArray, setMapsArray] = useState([])
   const dbTeams = useLiveQuery(() => db.teams.bulkGet([0, 1]))
+  const mapBansRef = useLiveQuery(() => db.mapbans.toArray())
   const [vetoLog, setVetoLog] = useState("")
   const [sides, setSides] = useState([])
 
@@ -19,7 +21,7 @@ function MapBans(props) {
     db.mapbans.toArray().then((arr) => setDbMapBans(arr))
     db.maps.toArray().then((arr) => setMapsArray(arr))
     db.sides.toArray().then((arr) => setSides(arr))
-  }, [setDbMapBans, dbTeams])
+  }, [setDbMapBans, dbTeams, mapBansRef])
 
   const sendToDb = () => {
     if (vetoLog === "") {
@@ -67,7 +69,9 @@ function MapBans(props) {
             maps={mapsArray}
             setMapBans={setDbMapBans}
           />
-          <Button intent="danger">Clear</Button>
+          <Button intent="danger" onClick={resetMapBans}>
+            Clear
+          </Button>
         </Pane>
       </Pane>
     </Layout>

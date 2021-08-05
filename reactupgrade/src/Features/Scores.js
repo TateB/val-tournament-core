@@ -3,12 +3,17 @@ import { Component, useEffect, useState } from "react"
 import db from "../db/db"
 import Layout from "./etc/Layout"
 import { sendScores } from "../webrtc/send"
+import { useLiveQuery } from "dexie-react-hooks"
 
 function Scores(props) {
   const [teams, setTeams] = useState([])
   const [pickedMaps, setPickedMaps] = useState([])
   const [mapsArray, setMapsArray] = useState([])
   const [settings, setSettings] = useState({})
+  const [scoreMap, _setScoreMap] = useState([])
+
+  const teamReference = useLiveQuery(() => db.teams.bulkGet([0, 1]))
+  const mapbansRef = useLiveQuery(() => db.mapbans.toArray())
 
   useEffect(() => {
     db.teams.bulkGet([0, 1]).then((scoresarray) => {
@@ -17,25 +22,32 @@ function Scores(props) {
     db.mapbans
       .where("isBan")
       .equals(0)
-      .toArray()
-      .then((array) => {
-        setPickedMaps(array)
-      })
+      .sortBy("played")
+      .then((array) =>
+        Promise.all([
+          setPickedMaps(array),
+          _setScoreMap([...Array(array.length).keys()]),
+        ])
+      )
     db.maps.toArray().then((array) => {
       setMapsArray(
-        array.map((obj) =>
-          obj.name.replace(/\b[a-z]/gi, (char) => char.toUpperCase())
+        array.map(
+          (obj) => obj.name.replace(/\b[a-z]/gi, (char) => char.toUpperCase()) // Capitalise word
         )
       )
     })
     db.settings.get("scores").then((obj) => setSettings(obj.settings))
     console.log(mapsArray)
-  }, [setTeams, setPickedMaps])
+  }, [teamReference, mapbansRef])
 
   const setScore = (team, inx, score) => {
     setTeams((prevState) => {
+      let otherScore = prevState[team ? 0 : 1].score[inx]
+      if (otherScore < 12 && parseInt(score) > 13) score = 13
+      if (otherScore > 12 && otherScore + 2 < score) score = otherScore + 2
+
       var prevTeams = [...prevState]
-      prevTeams[team].score[inx] = parseInt(score)
+      prevTeams[team].score[inx] = parseInt(score) || ""
       return prevTeams
     })
   }
@@ -48,11 +60,45 @@ function Scores(props) {
     })
   }
 
-  const submitToDb = () => {
-    db.teams.update(0, { score: teams[0].score })
-    db.teams.update(1, { score: teams[1].score })
-    db.settings.update("scores", { settings: settings })
-    sendScores(teams, settings)
+  const setScoreMap = (inx, newValue) => {
+    _setScoreMap((prevState) => {
+      const swapInx = prevState.indexOf(parseInt(newValue))
+      var prevSM = [...prevState]
+      ;[prevSM[inx], prevSM[swapInx]] = [prevSM[swapInx], prevSM[inx]]
+      return prevSM
+    })
+  }
+
+  const submitToDb = () =>
+    db.teams
+      .update(0, { score: teams[0].score })
+      .then(() => db.teams.update(1, { score: teams[1].score }))
+      .then(() => db.settings.update("scores", { settings: settings }))
+      .then(() => Math.max(...teams.map((tr) => tr.score.indexOf(0))))
+      .then((hasScores) =>
+        pickedMaps.map((m, inx) => {
+          if (inx < hasScores) {
+            console.log(m.id)
+            return m.id
+          }
+        })
+      )
+      .then((ids) => ids.filter((x) => x !== undefined))
+      .then((ids) =>
+        ids.map((x, inx) => {
+          console.log(x, inx)
+          return db.mapbans.update(x, { played: inx })
+        })
+      )
+      .then(() => sendScores(teams, settings))
+
+  const clearScores = () => {
+    const clearArray = pickedMaps.fill(0)
+    db.teams
+      .toCollection()
+      .modify({ score: clearArray })
+      .then(() => db.mapbans.toCollection().modify({ played: undefined }))
+      .then(() => sendScores(teamReference, settings))
   }
 
   return (
@@ -77,7 +123,22 @@ function Scores(props) {
               justifyContent="space-between"
             >
               <Text>Map {inx + 1}</Text>
-              <Text marginRight={4}>{mapsArray[map.map]}</Text>
+              <Select
+                disabled={
+                  teams[0].score[inx - 1] > 0 ||
+                  teams[1].score[inx - 1] > 0 ||
+                  inx === 0
+                    ? false
+                    : true
+                }
+                value={scoreMap[inx]}
+                onChange={(e) => setScoreMap(inx, e.target.value)}
+                maxWidth={120}
+              >
+                {pickedMaps.map((umap, uinx) => (
+                  <option value={uinx}>{mapsArray[umap.map]}</option>
+                ))}
+              </Select>
             </Pane>
             <TextInput
               name={inx}
@@ -137,7 +198,9 @@ function Scores(props) {
             onChange={(e) => setValue("reversed", e.target.checked)}
           />
           <Pane flexGrow="1"></Pane>
-          <Button intent="danger">Clear</Button>
+          <Button intent="danger" onClick={clearScores}>
+            Clear
+          </Button>
         </Pane>
       </Pane>
     </Layout>

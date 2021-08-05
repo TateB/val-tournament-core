@@ -6,13 +6,15 @@ import {
   Button,
   Strong,
   IconButton,
+  CogIcon,
 } from "evergreen-ui"
 import { Component, useEffect, useState, Fragment } from "react"
 import Layout from "./etc/Layout"
 import db from "../db/db"
 import { twitchIcon, nightbotIcon } from "../icons/icons"
-import { twitch, convertMiliseconds } from "../apis/apis"
+import { twitch, nightbot, convertMiliseconds } from "../apis/apis"
 import { useLiveQuery } from "dexie-react-hooks"
+import { NbSettings } from "./Integrations/NbSettings"
 
 const Integrations = (props) => {
   const twitchState = useLiveQuery(() => db.userSessions.get("twitch"))
@@ -23,8 +25,7 @@ const Integrations = (props) => {
   }, [])
 
   if (!twitchState) return null
-
-  const nightbotRedirect = () => {}
+  if (!nightbotState) return null
 
   return (
     <Layout
@@ -80,7 +81,12 @@ const Integrations = (props) => {
             </Button>
           )}
         </Pane>
-        <Pane display="flex" flexDirection="row" alignItems="center">
+        <Pane
+          display="flex"
+          flexDirection="row"
+          alignItems="center"
+          marginBottom={8}
+        >
           <img
             src={nightbotIcon}
             alt="Nightbot Icon"
@@ -88,13 +94,41 @@ const Integrations = (props) => {
           />
           <Text flexGrow="1" size={500}>
             Nightbot
-            <Strong marginLeft={8} size={500}>
-              Not Logged In
-            </Strong>
+            {nightbotState.authenticated ? (
+              <Strong marginLeft={8} size={500}>
+                Logged In as {nightbotState.session.username} (
+                {convertMiliseconds(nightbotState.expiresAt - Date.now(), "d")}{" "}
+                days left)
+              </Strong>
+            ) : (
+              <Strong marginLeft={8} size={500}>
+                Not Logged In
+              </Strong>
+            )}
           </Text>
-          <Button width={156} onClick={nightbotRedirect}>
-            Login with Nightbot
-          </Button>
+          {nightbotState.authenticated ? (
+            <Fragment>
+              <NbSettings />
+              <IconButton
+                marginLeft={8}
+                icon={RefreshIcon}
+                onClick={nightbot.generateLoginLink}
+                intent="success"
+              />
+              <Button
+                marginLeft={8}
+                width={156}
+                onClick={nightbot.logout}
+                intent="danger"
+              >
+                Logout of Nighbot
+              </Button>
+            </Fragment>
+          ) : (
+            <Button width={156} onClick={nightbot.generateLoginLink}>
+              Login with Nightbot
+            </Button>
+          )}
         </Pane>
       </Pane>
     </Layout>

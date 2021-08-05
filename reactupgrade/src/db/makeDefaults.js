@@ -11,9 +11,9 @@ const makeDefaults = async () => {
     { id: 5, name: "split" },
   ])
   await db.sides.bulkPut([
-    { id: 0, name: "attack" },
-    { id: 1, name: "defence" },
-    { id: 2, name: "none" },
+    { id: 0, name: "attack", short: "atk" },
+    { id: 1, name: "defence", short: "def" },
+    { id: 2, name: "none", short: "n/a" },
   ])
   await db.mapbans.bulkPut([
     { id: 0, map: 0, isBan: 1, teamPick: 0, sidePick: 2, isShowing: true },
@@ -77,7 +77,39 @@ const makeDefaults = async () => {
     {
       name: "nightbot",
       settings: {
-        commands: {},
+        commands: [
+          {
+            name: "bracket",
+            id: undefined,
+            example:
+              "@User, The bracket for this tournament is: https://example.com",
+          },
+          {
+            name: "caster",
+            id: undefined,
+            example: "@User, Your caster for today is: Streamer",
+          },
+          {
+            name: "delay",
+            id: undefined,
+            example: "@User, Stream delay is set to 3 minutes",
+          },
+          {
+            name: "maps",
+            id: undefined,
+            example: "@User, TEMA picks ASCENT (TEMB DEF)",
+          },
+          {
+            name: "score",
+            id: undefined,
+            example: "@User, TEMA wins ASCENT (12 - 5)",
+          },
+        ],
+        casters: [{ name: "streamer", URL: "https://twitch.tv" }],
+        matchInformation: [
+          { name: "tournamentLink", URL: "https://example.com" },
+        ],
+        // in future: commandText
       },
     },
     {

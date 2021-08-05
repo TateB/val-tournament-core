@@ -1,6 +1,5 @@
 import { useLiveQuery } from "dexie-react-hooks"
-import { Pane, Text, TextInput, Button, Select, Spinner } from "evergreen-ui"
-import { Component, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import db from "../db/db"
 import Layout from "./etc/Layout"
 import States from "./Predictions/States"
@@ -30,7 +29,14 @@ function Predictions(props) {
     teams.length === 0 ||
     maps.length === 0
   )
-    return null
+    return (
+      <Layout
+        name={props.name}
+        openAppCallback={props.openAppCallback}
+        openedApp={props.openedApp}
+        protocols={["predictions"]}
+      ></Layout>
+    )
 
   return (
     <Layout
@@ -39,27 +45,16 @@ function Predictions(props) {
       openedApp={props.openedApp}
       protocols={["predictions"]}
     >
-      {loading ? (
-        <Pane
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          height={250}
-        >
-          <Spinner />
-        </Pane>
-      ) : (
-        <States
-          cState={cState}
-          teams={teams}
-          setCState={setCState}
-          pickedMaps={pickedMaps}
-          maps={maps}
-          setLoading={setLoading}
-          predState={predSettings.settings}
-          loading={loading}
-        />
-      )}
+      <States
+        cState={cState}
+        teams={teams}
+        setCState={setCState}
+        pickedMaps={pickedMaps}
+        maps={maps}
+        setLoading={setLoading}
+        predState={predSettings.settings}
+        loading={loading}
+      />
     </Layout>
   )
 }

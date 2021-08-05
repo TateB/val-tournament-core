@@ -129,6 +129,7 @@ function isAuthed(settings) {
 }
 
 function standardFetch(accessToken, category, method, body) {
+  console.log(body)
   var URI = "https://api.twitch.tv/helix/" + category
   var options = {
     method: method,
@@ -340,6 +341,7 @@ const allFunctions = {
   submitPrediction,
   cancelPrediction,
   fetchPredictions,
+  submitPredictionResult,
 }
 
 export default allFunctions

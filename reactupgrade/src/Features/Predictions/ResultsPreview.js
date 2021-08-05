@@ -13,8 +13,10 @@ function kNum(num) {
 
 function ResultsPreview(props) {
   var fetchPredsTask
-  const [minutes, setMinutes] = useState("00")
-  const [seconds, setSeconds] = useState("00")
+  const [minutes, setMinutes] = useState(
+    Math.floor(props.predLength / 60) || "00"
+  )
+  const [seconds, setSeconds] = useState(props.predLength % 60)
   const [predsResult, setPredsResult] = useState([])
 
   useEffect(

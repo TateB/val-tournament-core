@@ -9,7 +9,7 @@ import {
 } from "evergreen-ui"
 import { useEffect, useState } from "react"
 import db from "../db/db"
-import resetSettings from "../db/resetToDefault"
+import { resetSettings } from "../db/resetToDefault"
 import {
   sendTimerReset,
   sendTimerStart,

@@ -21,14 +21,7 @@ function Created(props) {
   ])
   const [scores, setScores] = useState([0, 0])
   const [checked, setChecked] = useState(true)
-  const [otherMapInfo, setOMI] = useState({
-    id: 0,
-    isBan: 1,
-    isShowing: true,
-    map: 0,
-    sidePick: 2,
-    teamPick: 0,
-  })
+  const [otherMapInfo, setOMI] = useState(props.pStateProp.forMap)
   const [mapCount, setMapCount] = useState({ totalCount: 3, currentMap: 1 })
   const [predLength, setPredLength] = useState(0)
   const [infoLoaded, setInfoLoaded] = useState(false)
@@ -36,26 +29,29 @@ function Created(props) {
   useEffect(
     () =>
       Promise.all([
-        db.maps.toArray((arr) => arr.map((x) => x.name)),
-        db.settings.get("predictions"),
-        db.teams.bulkGet([0, 1]),
+        console.log(
+          "INDEX/CMAP",
+          props.teams.map((tr) => tr.score.indexOf(0))
+        ),
+        setPickedMap(props.maps[props.pStateProp.forMap.map]),
+        setTeams(props.teams.map((x) => ({ name: x.name, short: x.short }))),
+        setOMI(props.pStateProp.forMap),
+        setPredLength(props.pStateProp.predictionLength),
+        setMapCount({
+          totalCount: props.pickedMaps.length,
+          currentMap:
+            Math.max(...props.teams.map((tr) => tr.score.indexOf(0))) + 1,
+        }),
       ])
-        .then(([maps, predSet, teams]) =>
-          Promise.all([
-            setPickedMap(maps[predSet.settings.forMap.map]),
-            setTeams(teams.map((x) => ({ name: x.name, short: x.short }))),
-            setOMI(predSet.settings.forMap),
-            setPredLength(predSet.settings.predictionLength),
-          ])
+        .then(() =>
+          console.log(
+            props.teams,
+            mapCount.currentMap,
+            props.teams.map((x) => x)
+          )
         )
-        .then(() => db.mapbans.where("isBan").equals(0).toArray())
-        .then((mbRef) =>
-          setMapCount({
-            totalCount: mbRef.length,
-            currentMap: mbRef.findIndex((x) => (x.id = otherMapInfo.id)) + 1,
-          })
-        )
-        .then(() => setInfoLoaded(true)),
+        .then(() => setInfoLoaded(true))
+        .then(() => console.log(otherMapInfo)),
     [props]
   )
 
@@ -64,17 +60,31 @@ function Created(props) {
     twitch.cancelPrediction()
   }
 
+  const setScore = (team, score) => {
+    setScores((prevState) => {
+      let otherScore = prevState[team ? 0 : 1]
+      if (otherScore < 12 && parseInt(score) > 13) score = 13
+      if (otherScore > 12 && otherScore + 2 < score) score = otherScore + 2
+
+      var prevTeams = [...prevState]
+      prevTeams[team] = parseInt(score) || ""
+      return prevTeams
+    })
+  }
+
   const submitPred = () => {
     const submitPredEv = new CustomEvent("submitPred", {
       detail: {
         force: !checked,
         scores: scores,
         setLoading: props.setLoading,
+        selected: otherMapInfo,
       },
-      bubbles: true,
+      bubbles: false,
       cancelable: false,
       composed: false,
     })
+    console.log("DISPATCHING SUBMISSION")
     window.dispatchEvent(submitPredEv)
   }
 
@@ -105,7 +115,7 @@ function Created(props) {
                 name="teama"
                 flexGrow="1"
                 value={scores[0]}
-                onChange={(e) => setScores([e.target.value, scores[1]])}
+                onChange={(e) => setScore(0, e.target.value)}
               />
               <TextInputField
                 label={teams[1].name + " Score"}
@@ -113,7 +123,7 @@ function Created(props) {
                 name="teamb"
                 flexGrow="1"
                 value={scores[1]}
-                onChange={(e) => setScores([scores[0], e.target.value])}
+                onChange={(e) => setScore(1, e.target.value)}
               />
             </Pane>
           </Pane>
@@ -124,7 +134,11 @@ function Created(props) {
             onChange={(e) => setChecked(e.target.checked)}
           />
           <Pane display="flex" flexDirection="row" marginTop={8}>
-            <Button intent="success" onClick={submitPred}>
+            <Button
+              intent="success"
+              disabled={scores[0] === scores[1]}
+              onClick={submitPred}
+            >
               Submit
             </Button>
             <Pane flexGrow="1"></Pane>
