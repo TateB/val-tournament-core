@@ -11,11 +11,14 @@ import {
   Text,
   Spinner,
   TextInput,
+  Card,
+  Button,
 } from "evergreen-ui"
 import { Fragment } from "react"
 import { useEffect, useState } from "react"
 import { nightbot } from "../../apis/apis"
 import db from "../../db/db"
+import { NbTabs } from "./NbTabs"
 
 export const NbSettings = () => {
   const tabs = [
@@ -24,6 +27,7 @@ export const NbSettings = () => {
     { name: "Match Info", dbRef: "matchInformation" },
   ]
   const [settings, setSettings] = useState()
+  const [isOriginal, setIsOriginal] = useState(true)
   const [isShowing, setIsShowing] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [nightbotCommands, setNightbotCommands] = useState()
@@ -32,9 +36,18 @@ export const NbSettings = () => {
     db.settings.get("nightbot").then((arr) => arr.settings)
   )
 
-  useEffect(() =>
-    db.settings.get("nightbot").then((arr) => setSettings(arr), [settingsRef])
+  useEffect(
+    () => db.settings.get("nightbot").then((arr) => setSettings(arr.settings)),
+    [settingsRef]
   )
+
+  useEffect(() => {
+    if (settings === undefined || settingsRef === undefined) return
+    Promise.all([JSON.stringify(settings), JSON.stringify(settingsRef)]).then(
+      (sets) =>
+        sets[0] === sets[1] ? setIsOriginal(true) : setIsOriginal(false)
+    )
+  }, [settings])
 
   useEffect(() => {
     if (!isShowing) return
@@ -59,16 +72,40 @@ export const NbSettings = () => {
     })
   }
 
-  const setOther = (category, inx, type, newVal) => {
+  const setOther = (category, nameinx, inx, newVal) => {
     setSettings((prevState) => {
       const prevSettings = { ...prevState }
-      prevSettings[category][inx][type] = newVal
+      prevSettings[category][nameinx].infoVals[inx].value = newVal
       return prevSettings
     })
   }
 
+  const addNewCaster = (newVal) => {
+    setSettings((prevState) => {
+      const prevSettings = { ...prevState }
+      console.log("ADDING CASTER", newVal)
+      prevSettings.casters.push(newVal)
+      return prevSettings
+    })
+  }
+
+  const removeCaster = (inx) => {
+    setSettings((prevState) => {
+      const prevSettings = { ...prevState }
+      prevSettings.casters.splice(inx)
+      return prevSettings
+    })
+  }
+
+  const cancelChanges = () => {
+    setSettings({ ...settingsRef })
+  }
+
+  const submitToDb = () =>
+    db.settings.update("nightbot", { settings: settings })
+
   return (
-    <>
+    <Fragment>
       <SideSheet
         isShown={isShowing}
         onCloseComplete={() => setIsShowing(false)}
@@ -79,14 +116,22 @@ export const NbSettings = () => {
         }}
       >
         {!isLoading ? (
-          <Pane>
-            <Pane>
-              <Heading>Nightbot Settings</Heading>
+          <Pane padding={16}>
+            <Pane marginBottom={8}>
+              <Heading size={800}>Nightbot Settings</Heading>
             </Pane>
-            <Pane>
-              <Tablist marginBottom={16} flexGrow="1" marginRight={24}>
-                {tabs.map((tab, index) => (
+            <Card
+              background="tint2"
+              elevation={1}
+              padding={4}
+              marginBottom={8}
+              display="flex"
+              flex-direction="row"
+            >
+              <Tablist flexGrow="1">
+                {NbTabs.map((tab, index) => (
                   <Tab
+                    height="auto"
                     key={tab.dbRef}
                     id={tab.dbRef}
                     onSelect={() => setSelectedIndex(index)}
@@ -97,56 +142,33 @@ export const NbSettings = () => {
                   </Tab>
                 ))}
               </Tablist>
-            </Pane>
-            {tabs.map((tab, index) => (
-              <Pane
-                key={index}
-                id={`panel-${tab.dbRef}`}
-                role="tabpanel"
-                aria-labelledby={tab.dbRef}
-                aria-hidden={index !== selectedIndex}
-                display={index === selectedIndex ? "flex" : "none"}
-                width="100%"
-                alignItems="center"
-                flexDirection="column"
+              <Button
+                intent="danger"
+                marginRight={8}
+                disabled={isOriginal}
+                onClick={cancelChanges}
               >
-                {settingsRef[tab.dbRef].map((drop, inx) => (
-                  <Pane
-                    key={drop.name}
-                    width="100%"
-                    display="flex"
-                    alignItems="center"
-                    flexDirection="row"
-                    marginBottom={
-                      inx === settingsRef[tab.dbRef].length - 1 ? 0 : 16
-                    }
-                  >
-                    <Pane>
-                      <Text width="100%" textAlign="left" marginLeft={32}>
-                        {drop.name}
-                      </Text>
-                      {drop.example ? <Text>{drop.example}</Text> : undefined}
-                    </Pane>
-                    {tab.dbRef === "commands" ? (
-                      <SelectField
-                        value={drop.id}
-                        onChange={(e) => setCommand(inx, e.target.value)}
-                      >
-                        {nightbotCommands.map((x) => (
-                          <option value={x.id}>{x.name}</option>
-                        ))}
-                      </SelectField>
-                    ) : (
-                      Object.entries(drop).map(([key, val]) => (
-                        <TextInput
-                          onChange={(e) => setOther(tab.dbRef, inx, key, val)}
-                          value={val}
-                        />
-                      ))
-                    )}
-                  </Pane>
-                ))}
-              </Pane>
+                Cancel
+              </Button>
+              <Button
+                intent="success"
+                disabled={isOriginal}
+                onClick={submitToDb}
+              >
+                Submit
+              </Button>
+            </Card>
+            {NbTabs.map((Tab, index) => (
+              <Tab.element
+                index={index}
+                selectedIndex={selectedIndex}
+                settings={settings}
+                setCommand={setCommand}
+                nightbotCommands={nightbotCommands}
+                setOther={setOther}
+                addNewCaster={addNewCaster}
+                removeCaster={removeCaster}
+              />
             ))}
           </Pane>
         ) : (
@@ -160,6 +182,6 @@ export const NbSettings = () => {
         onClick={() => setIsShowing(true)}
         intent="none"
       />
-    </>
+    </Fragment>
   )
 }

@@ -105,9 +105,23 @@ const makeDefaults = async () => {
             example: "@User, TEMA wins ASCENT (12 - 5)",
           },
         ],
-        casters: [{ name: "streamer", URL: "https://twitch.tv" }],
+        casters: [
+          {
+            name: "Streamer",
+            infoVals: [
+              { name: "Username", value: "Streamer1" },
+              { name: "URL", value: "https://twitter.com/twitter" },
+            ],
+          },
+        ],
         matchInformation: [
-          { name: "tournamentLink", URL: "https://example.com" },
+          {
+            name: "Tournament",
+            infoVals: [
+              { name: "Name", value: "Tournament1" },
+              { name: "URL", value: "https://example.com/tournament" },
+            ],
+          },
         ],
         // in future: commandText
       },
