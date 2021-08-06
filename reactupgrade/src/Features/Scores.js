@@ -4,6 +4,7 @@ import db from "../db/db"
 import Layout from "./etc/Layout"
 import { sendScores } from "../webrtc/send"
 import { useLiveQuery } from "dexie-react-hooks"
+import { nightbot } from "../apis/apis"
 
 function Scores(props) {
   const [teams, setTeams] = useState([])
@@ -90,6 +91,7 @@ function Scores(props) {
           return db.mapbans.update(x, { played: inx })
         })
       )
+      .then(() => nightbot.setCommand(["maps", "score"]))
       .then(() => sendScores(teams, settings))
 
   const clearScores = () => {

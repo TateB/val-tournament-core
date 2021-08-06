@@ -102,7 +102,9 @@ export const NbSettings = () => {
   }
 
   const submitToDb = () =>
-    db.settings.update("nightbot", { settings: settings })
+    db.settings
+      .update("nightbot", { settings: settings })
+      .then(() => nightbot.setCommands(["caster", "bracket"]))
 
   return (
     <Fragment>

@@ -1,5 +1,6 @@
 import { Pane, Text, TextInput, Button } from "evergreen-ui"
 import { Component, useEffect, useState } from "react"
+import { nightbot } from "../apis/apis"
 import db from "../db/db"
 import { setNewTeams } from "../webrtc/send"
 import Layout from "./etc/Layout"
@@ -21,11 +22,14 @@ function Teams(props) {
 
   if (teams[0] == undefined) return null
 
-  const submitToDb = () => {
-    db.teams.update(0, { name: teams[0].name, short: teams[0].short })
-    db.teams.update(1, { name: teams[1].name, short: teams[1].short })
-    setNewTeams(teams)
-  }
+  const submitToDb = () =>
+    db.teams
+      .update(0, { name: teams[0].name, short: teams[0].short })
+      .then(() =>
+        db.teams.update(1, { name: teams[1].name, short: teams[1].short })
+      )
+      .then(() => setNewTeams(teams))
+      .then(() => nightbot.setCommands(["maps", "score"]))
 
   return (
     <Layout

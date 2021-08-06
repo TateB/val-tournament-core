@@ -38,13 +38,47 @@ export const getSpecifics = (needed) =>
       case "nbSet":
         db.settings.get("nightbot").then((obj) => resolve(obj.settings))
         break
+      case "commands":
+        db.settings
+          .get("nightbot")
+          .then((obj) => obj.settings.commands)
+          .then((obj) => resolve(obj))
+        break
       case "nbSession":
         db.userSessions.get("nightbot").then((obj) => resolve(obj))
         break
       case "delay":
         db.settings
           .get("general")
-          .then((obj) => resolve(obj.settings.streamDelay))
+          .then((obj) => obj.settings.streamDelay)
+          .then((sdelay) => [Math.floor(sdelay / 60), sdelay % 60])
+          .then((formatted) =>
+            resolve({ minutes: formatted[0], seconds: formatted[1] })
+          )
+        break
+      case "caster":
+        db.settings
+          .get("nightbot")
+          .then((obj) => obj.settings.casters)
+          .then((casters) =>
+            casters.map((x) => ({
+              name: x.infoVals[0].value,
+              url: x.infoVals[1].value,
+            }))
+          )
+          .then((casters) => resolve(casters))
+        break
+      case "bracket":
+        db.settings
+          .get("nightbot")
+          .then((obj) => obj.settings.matchInformation)
+          .then((mInfo) => mInfo.find((x) => x.name === "Tournament"))
+          .then((tourney) =>
+            resolve({
+              name: tourney.infoVals[0].value,
+              url: tourney.infoVals[1].value,
+            })
+          )
         break
       default:
         throw new Error("DB: Couldn't get " + needed)

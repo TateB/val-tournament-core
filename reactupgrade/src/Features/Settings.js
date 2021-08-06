@@ -12,6 +12,7 @@ import { BlockPicker } from "react-color"
 import Layout from "./etc/Layout"
 import db from "../db/db"
 import { resetSettings } from "../db/resetToDefault"
+import { nightbot } from "../apis/apis"
 
 function Settings(props) {
   const [settings, setSettings] = useState({
@@ -40,9 +41,10 @@ function Settings(props) {
     })
   }
 
-  const submitToDb = () => {
-    db.settings.update("general", { settings: settings })
-  }
+  const submitToDb = () =>
+    db.settings
+      .update("general", { settings: settings })
+      .then(() => nightbot.setCommand("delay"))
 
   const resetToDefault = () => {
     resetSettings("general")
@@ -121,12 +123,6 @@ function Settings(props) {
               label="Use Lowercase Styling"
               checked={settings.isLowerCase}
               onChange={(e) => setValue("isLowerCase", e.target.checked)}
-            />
-            <Checkbox
-              name="nightbotDelay"
-              label="Use Stream Delay When Updating Nightbot"
-              checked={settings.nightbotDelay}
-              onChange={(e) => setValue("nightbotDelay", e.target.checked)}
             />
             <TextInputField
               width={240}

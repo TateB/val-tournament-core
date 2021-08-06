@@ -140,7 +140,9 @@ export const Casters = (props) => {
             <TextInput
               marginX={4}
               placeholder={item.name}
-              onChange={(e) => props.setOther("casters", ii, item.value)}
+              onChange={(e) =>
+                props.setOther("casters", inx, ii, e.target.value)
+              }
               value={item.value}
             />
           ))}

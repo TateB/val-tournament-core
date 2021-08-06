@@ -34,7 +34,7 @@ const submitPredListener = async (e) => {
     .then(() => delay(force ? 0 : genSet.streamDelay * 1000))
     .then(() => calculateTeamInx(teams))
     .then((teamInx) => twitch.submitPredictionResult(teamInx))
-    .then(() => nightbot.setCommand(["score", "maps"], teams))
+    .then(() => nightbot.setCommand("score"))
     .then(() => (force ? e.detail.setLoading(false) : null))
     .catch((err) => console.error(err.message))
 }

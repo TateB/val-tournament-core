@@ -148,22 +148,37 @@ const logout = async () => {
     })
 }
 
-const setCommands = (commands) =>
-  Promise.all(commands.map((x) => setCommand(x[0], x[1])))
+const requiredVars = {
+  bracket: ["bracket"],
+  caster: ["caster"],
+  delay: ["delay"],
+  maps: ["picks", "teams", "maps", "sides"],
+  score: ["played", "teams", "maps"],
+}
 
-const setCommand = (command, vars) => {
+const setCommands = (commands) =>
+  Promise.all(commands.map((x) => setCommand(x)))
+
+const checkForId = (id) =>
+  new Promise((resolve, reject) =>
+    id !== undefined ? resolve() : reject("Id does not exist for command")
+  )
+
+const setCommand = (command) => {
   var dbVars
   var userId
   var settingId
   var processedMessages
 
-  return Promise.all(vars.map((x) => getSpecifics(x)))
+  return Promise.all(requiredVars[command].map((x) => getSpecifics(x)))
     .then((dbVarsRec) => (dbVars = dbVarsRec))
+    .then(() => console.log(dbVars))
     .then(() => getSpecifics("nbSession"))
-    .then((dbUid) => (userId = dbUid))
-    .then(() => getSpecifics("nbSet"))
+    .then((sess) => (userId = sess.session.accessToken))
+    .then(() => getSpecifics("commands"))
     .then((nbSet) => nbSet.find((x) => x.name === command))
-    .then((foundId) => (settingId = foundId))
+    .then((foundCommand) => (settingId = foundCommand.id))
+    .then((id) => checkForId(id))
     .then(() => generateCommandText(command, dbVars))
     .then((text) =>
       JSON.stringify({
@@ -173,6 +188,7 @@ const setCommand = (command, vars) => {
     .then((sendBody) =>
       fetch("https://api.nightbot.tv/1/commands/" + settingId, {
         method: "PUT",
+        body: sendBody,
         headers: {
           Authorization: "Bearer " + userId,
           "Content-Type": "application/json",
@@ -180,7 +196,9 @@ const setCommand = (command, vars) => {
       })
     )
     .catch((err) =>
-      Promise.reject("Nightbot: Error setting command " + command)
+      Promise.reject(
+        "Nightbot: Error setting command " + command + " :: " + err
+      )
     )
 }
 
@@ -188,11 +206,14 @@ const generateCommandText = (command, vars) => {
   return new Promise((resolve) => {
     switch (command) {
       case "bracket": {
-        resolve("@$(user), The bracket for this tournament is: " + vars[0])
+        resolve(
+          "@$(user), The bracket for " + vars[0].name + " is: " + vars[0].url
+        )
         return
       }
       case "caster": {
         if (vars.length > 1) {
+          console.log(vars.length, vars)
           var finalMsg = "@$(user), Your casters for today are: "
           vars.map((x, i) =>
             i === vars.length - 1
@@ -201,6 +222,7 @@ const generateCommandText = (command, vars) => {
           )
           resolve(finalMsg)
         } else {
+          console.log(vars)
           resolve(
             `@$(user), Your caster for today is: ${vars[0].name}, ${vars[0].url}`
           )
