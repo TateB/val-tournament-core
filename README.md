@@ -1,4 +1,4 @@
-# Valorant Stream Overlay
+# Valorant Twitch Tournament Overlay/Manager
 
 ## For valorant map bans, a timer, score overlays, and more
 
