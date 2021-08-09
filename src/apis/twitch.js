@@ -1,6 +1,6 @@
-import db from "../db/db"
-import IdTokenVerifier from "idtoken-verifier"
 import crypto from "crypto"
+import IdTokenVerifier from "idtoken-verifier"
+import db from "../db/db"
 
 const authCheck = async () => {
   const errorQuery = new URLSearchParams(window.location.search).get("error")
@@ -18,29 +18,25 @@ const authCheck = async () => {
 
   const nonce = await db.userSessions.get("twitch").nonce
 
-  const tryVerify = await verifier.verify(
-    resObj.id_token,
-    nonce,
-    (err, payload) => {
-      global.log(payload)
-      if (err) return console.error(err)
-      db.userSessions
-        .update("twitch", {
-          session: {
-            accessToken: resObj.access_token,
-            userId: payload.sub,
-            username: payload.preferred_username,
-          },
-          nonce: "",
-          authenticated: true,
-        })
-        .then(() => {
-          revalidateToken()
-          window.location.hash = ""
-          window.history.replaceState("", "", "/")
-        })
-    }
-  )
+  await verifier.verify(resObj.id_token, nonce, (err, payload) => {
+    global.log(payload)
+    if (err) return console.error(err)
+    db.userSessions
+      .update("twitch", {
+        session: {
+          accessToken: resObj.access_token,
+          userId: payload.sub,
+          username: payload.preferred_username,
+        },
+        nonce: "",
+        authenticated: true,
+      })
+      .then(() => {
+        revalidateToken()
+        window.location.hash = ""
+        window.history.replaceState("", "", "/")
+      })
+  })
 }
 
 const revalidateToken = async () => {
@@ -303,7 +299,7 @@ const submitPredictionResult = (teamInx) => {
 }
 
 const fetchPredictions = () => {
-  var twitch, predSet, predResV
+  var twitch, predSet
   return db.userSessions
     .get("twitch")
     .then((obj) => (twitch = obj))

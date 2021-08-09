@@ -1,6 +1,6 @@
 import { useLiveQuery } from "dexie-react-hooks"
 import { Pane, Textarea, Button } from "evergreen-ui"
-import { Component, useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import db from "../db/db"
 import { resetMapBans } from "../db/resetToDefault"
 import { sendMapBans } from "../webrtc/send"

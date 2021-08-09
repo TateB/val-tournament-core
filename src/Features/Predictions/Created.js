@@ -1,16 +1,13 @@
-import { useState, Fragment, useEffect } from "react"
 import {
-  Pane,
   Button,
-  Heading,
   Checkbox,
+  Heading,
+  Pane,
   Text,
   TextInputField,
-  Card,
-  Spinner,
 } from "evergreen-ui"
+import { Fragment, useEffect, useState } from "react"
 import { twitch } from "../../apis/apis"
-import db from "../../db/db"
 import ResultsPreview from "./ResultsPreview"
 
 function Created(props) {
@@ -52,6 +49,7 @@ function Created(props) {
         )
         .then(() => setInfoLoaded(true))
         .then(() => global.log(otherMapInfo)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [props]
   )
 
@@ -104,7 +102,7 @@ function Created(props) {
               {" " + teams[otherMapInfo.teamPick].name + " Pick"}
             </span>
             <span style={{ color: "#8f95b2" }}>
-              {" " + "Map " + mapCount.currentMap + "/" + mapCount.totalCount}
+              {" Map " + mapCount.currentMap + "/" + mapCount.totalCount}
             </span>
           </Heading>
           <Pane display="flex" flexDirection="row" marginTop={8}>

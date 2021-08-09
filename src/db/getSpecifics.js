@@ -82,6 +82,5 @@ export const getSpecifics = (needed) =>
         break
       default:
         throw new Error("DB: Couldn't get " + needed)
-        break
     }
   })

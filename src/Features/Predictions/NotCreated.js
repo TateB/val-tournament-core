@@ -1,14 +1,13 @@
-import { useState, Fragment, useEffect } from "react"
 import {
-  Pane,
   Button,
-  Label,
-  SelectField,
-  Text,
-  Strong,
-  TextInputField,
   Card,
+  Pane,
+  SelectField,
+  Strong,
+  Text,
+  TextInputField,
 } from "evergreen-ui"
+import { Fragment, useEffect, useState } from "react"
 import { twitch } from "../../apis/apis"
 import db from "../../db/db"
 
@@ -34,7 +33,7 @@ function NotCreated(props) {
     db.settings
       .get("predictions")
       .then((set) => setPredLength(set.settings.predictionLength))
-  }, [selected])
+  }, [selected, props.maps, props.teams, unplayedPicks])
 
   const submitToTwitch = () => {
     props.setLoading(true)

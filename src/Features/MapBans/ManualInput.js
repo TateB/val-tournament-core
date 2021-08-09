@@ -1,13 +1,13 @@
 import {
-  Pane,
   Button,
-  SideSheet,
-  Tablist,
-  Tab,
   Combobox,
+  Pane,
+  SideSheet,
+  Tab,
+  Tablist,
   Text,
 } from "evergreen-ui"
-import { useState, Fragment, useEffect, useRef, useCallback } from "react"
+import { Fragment, useEffect, useRef, useState } from "react"
 
 function usePrevious(value) {
   const ref = useRef()

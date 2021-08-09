@@ -6,7 +6,6 @@ function textInput(teams, mapinput, mapsArray, sides) {
     const teamShorts = teams.map((x) => x.short)
     const maps = mapsArray.map((x) => x.name)
 
-    var invalid = false
     let vetos = mapinput
     let mapPicks = vetos.split(/\r?\n/).map((x) => x.toLowerCase()) // splits into lines
     let potentialTeamSearch = await teamNames.map((x) =>
@@ -85,7 +84,7 @@ function textInput(teams, mapinput, mapsArray, sides) {
     )
       .then(() => {
         if (
-          mapOrder.find((x) => x.teamPick == 2) ||
+          mapOrder.find((x) => x.teamPick === 2) ||
           mapOrder.length === maps.length
         ) {
           // Autoban already added

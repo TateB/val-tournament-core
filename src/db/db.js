@@ -1,6 +1,4 @@
 import Dexie from "dexie"
-import makeDefaults from "./makeDefaults"
-import { useLiveQuery } from "dexie-react-hooks"
 
 const db = new Dexie("valDB")
 db.version(1).stores({

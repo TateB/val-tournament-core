@@ -1,17 +1,15 @@
 import {
-  Pane,
-  Text,
-  SelectField,
   Card,
-  Strong,
-  TextInput,
   IconButton,
-  PlusIcon,
-  DeleteIcon,
-  RemoveIcon,
   MinusIcon,
+  Pane,
+  PlusIcon,
+  SelectField,
+  Strong,
+  Text,
+  TextInput,
 } from "evergreen-ui"
-import { Fragment, useEffect, useState } from "react"
+import { useState } from "react"
 
 export const Commands = (props) => {
   return (
@@ -236,7 +234,7 @@ export const MatchInfo = (props) => {
 }
 
 export const NbTabs = [
-  { name: "Commands", dbRef: "commands", element: Commands },
-  { name: "Casters", dbRef: "casters", element: Casters },
-  { name: "Match Info", dbRef: "matchInformation", element: MatchInfo },
+  { name: "Commands", dbRef: "commands", Element: Commands },
+  { name: "Casters", dbRef: "casters", Element: Casters },
+  { name: "Match Info", dbRef: "matchInformation", Element: MatchInfo },
 ]

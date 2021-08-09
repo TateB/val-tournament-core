@@ -1,21 +1,19 @@
 import { useLiveQuery } from "dexie-react-hooks"
 import {
-  Text,
-  Pane,
+  CaretDownIcon,
+  FullCircleIcon,
   Heading,
   IconButton,
-  CaretDownIcon,
-  Tooltip,
-  TickCircleIcon,
-  FullCircleIcon,
+  Pane,
   Position,
+  Text,
   TextInput,
+  Tooltip,
 } from "evergreen-ui"
-import { Component, useCallback, useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import AnimateHeight from "react-animate-height"
 import db from "../../db/db"
 import "./Features.css"
-import useEvent from "./useEvent"
 
 function Layout(props) {
   const [bodyShowing, setBodyShowing] = useState(props.name === props.openedApp)
@@ -33,6 +31,7 @@ function Layout(props) {
 
   useEffect(
     () => setBodyShowing(props.name === props.openedApp),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [props.openedApp]
   )
 
@@ -47,6 +46,7 @@ function Layout(props) {
           )
         )
       : null
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const toggleShow = () => props.openAppCallback(props.name)
