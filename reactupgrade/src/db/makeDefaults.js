@@ -59,6 +59,7 @@ const makeDefaults = async () => {
         nightbotDelay: true,
         useCustomIcon: false,
         customIcon: "",
+        useDarkMode: false,
       },
     },
     {

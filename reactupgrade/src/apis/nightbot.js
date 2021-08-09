@@ -74,7 +74,7 @@ function isAuthed(settings) {
     if (settings.authenticated) {
       return resolve()
     } else {
-      return reject("Not authenticated with Twitch")
+      return reject("Not authenticated with Nightbot")
     }
   })
 }
@@ -207,12 +207,16 @@ const generateCommandText = (command, vars) => {
     switch (command) {
       case "bracket": {
         resolve(
-          "@$(user), The bracket for " + vars[0].name + " is: " + vars[0].url
+          "@$(user), The bracket for " +
+            vars[0].name +
+            " can be found here: " +
+            vars[0].url
         )
         return
       }
       case "caster": {
-        if (vars.length > 1) {
+        const [casters] = vars
+        if (casters.length > 1) {
           console.log(vars.length, vars)
           var finalMsg = "@$(user), Your casters for today are: "
           vars.map((x, i) =>
@@ -224,14 +228,16 @@ const generateCommandText = (command, vars) => {
         } else {
           console.log(vars)
           resolve(
-            `@$(user), Your caster for today is: ${vars[0].name}, ${vars[0].url}`
+            `@$(user), Your caster for today is: ${casters[0].name}, ${casters[0].url}`
           )
         }
         return
       }
       case "delay": {
         var finalMsg = "@$(user), Stream delay is set to "
-        if (vars[0].minutes) finalMsg += vars[0].minutes + " minutes"
+        if (vars[0].minutes)
+          finalMsg +=
+            vars[0].minutes + " minute" + vars[0].minutes > 1 ? "s" : ""
         if (vars[0].seconds && vars[0].minutes)
           finalMsg += " and " + vars[0].seconds
         if (vars[0].seconds && !vars[0].minutes)
@@ -260,9 +266,10 @@ const generateCommandText = (command, vars) => {
         return calculateWinnerArray(teams)
           .then((winnerArr) =>
             winnerArr.map((x, inx) => {
+              console.log(maps, played, inx)
               finalMsg += `${teams[x].short.toUpperCase()} wins ${maps[
                 played[inx].map
-              ].toUpperCase()} (${teams[x].score[inx]} - ${
+              ].name.toUpperCase()} (${teams[x].score[inx]} - ${
                 teams[x ? 0 : 1].score[inx]
               })`
               if (inx !== played.length - 1) finalMsg += ", "

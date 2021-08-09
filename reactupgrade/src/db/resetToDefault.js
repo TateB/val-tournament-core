@@ -28,6 +28,7 @@ export const resetSettings = async (setting) => {
           nightbotDelay: true,
           useCustomIcon: false,
           customIcon: "",
+          useDarkMode: false,
         },
       })
       return

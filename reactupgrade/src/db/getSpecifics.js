@@ -25,8 +25,8 @@ export const getSpecifics = (needed) =>
         break
       case "played":
         db.mapbans
-          .where("played")
           .toArray()
+          .then((arr) => arr.filter((x) => x.played !== undefined))
           .then((arr) => resolve(arr))
         break
       case "sides":

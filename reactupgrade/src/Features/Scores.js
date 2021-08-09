@@ -38,7 +38,6 @@ function Scores(props) {
       )
     })
     db.settings.get("scores").then((obj) => setSettings(obj.settings))
-    console.log(mapsArray)
   }, [teamReference, mapbansRef])
 
   const setScore = (team, inx, score) => {
@@ -91,7 +90,7 @@ function Scores(props) {
           return db.mapbans.update(x, { played: inx })
         })
       )
-      .then(() => nightbot.setCommand(["maps", "score"]))
+      .then(() => nightbot.setCommands(["maps", "score"]))
       .then(() => sendScores(teams, settings))
 
   const clearScores = () => {
@@ -100,6 +99,7 @@ function Scores(props) {
       .toCollection()
       .modify({ score: clearArray })
       .then(() => db.mapbans.toCollection().modify({ played: undefined }))
+      .then(() => nightbot.setCommands(["maps", "score"]))
       .then(() => sendScores(teamReference, settings))
   }
 
