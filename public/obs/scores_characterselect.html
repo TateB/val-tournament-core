@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --colour-scheme: #fd4453;
+      }
+
+      .cls-1 {
+        fill: var(--colour-scheme);
+      }
+    </style>
+    <script type="text/javascript" src="simplepeer.min.js"></script>
+    <script type="text/javascript" src="obs.js"></script>
+    <script>
+      recievedData.registerListener((newVal) => {
+        const { genset, teams, settings } = newVal
+        const finalTeam = settings.reversed
+          ? [teams[1], teams[0]]
+          : [teams[0], teams[1]]
+        document.documentElement.style.setProperty(
+          "--colour-scheme",
+          genset.useVOTColours ? "#fd4453" : genset.customColour
+        )
+        document.getElementById("rightTeam").innerHTML =
+          finalTeam[1].name.toUpperCase()
+        document.getElementById("leftTeam").innerHTML =
+          finalTeam[0].name.toUpperCase()
+        document.getElementById("rightLogo").src = finalTeam[1].iconLink
+        document.getElementById("leftLogo").src = finalTeam[0].iconLink
+      })
+    </script>
+    <style>
+      .inSvg {
+        height: 80px;
+        width: 80px;
+        padding: 10px;
+        background-color: rgb(51, 51, 51);
+        border-radius: 15px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <svg
+      id="Layer_1"
+      data-name="Layer 1"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 1920 1080"
+    >
+      <defs>
+        <style>
+          .cls-2 {
+            font-size: 19.16px;
+          }
+
+          .cls-2,
+          .cls-3 {
+            fill: #fff;
+            font-family: Poppins-Medium, Poppins;
+            font-weight: 500;
+          }
+
+          .cls-3 {
+            font-size: 26.65px;
+          }
+        </style>
+      </defs>
+      <text
+        id="rightTeam"
+        class="cls-3 rightteam"
+        text-anchor="end"
+        transform="translate(1873 50)"
+      ></text>
+      <foreignObject width="100" height="100" x="1440" y="25">
+        <img
+          class="inSvg"
+          id="rightLogo"
+          src=""
+          xmlns="http://www.w3.org/1999/xhtml"
+        />
+      </foreignObject>
+      <foreignObject width="100" height="100" x="380" y="25">
+        <img
+          class="inSvg"
+          id="leftLogo"
+          src=""
+          xmlns="http://www.w3.org/1999/xhtml"
+        />
+      </foreignObject>
+      <text
+        id="leftTeam"
+        class="cls-3 leftteam"
+        text-anchor="start"
+        transform="translate(47 50)"
+      ></text>
+    </svg>
+  </body>
+</html>

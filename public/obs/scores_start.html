@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      :root {
+        --colour-scheme: #fd4453;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      .cls-2,
+      .cls-3 {
+        color: #fff;
+        font-family: Poppins-Regular, Poppins;
+        font-weight: 400;
+      }
+
+      .cls-3 {
+        font-size: 60px;
+        line-height: 70px;
+        text-align: right;
+      }
+
+      .icons {
+        margin-top: 10px;
+        margin-left: 20px;
+        height: 195px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      .icons img {
+        width: 35px;
+        height: 35px;
+        padding: 10px;
+        background-color: rgb(51, 51, 51);
+        border-radius: 15px;
+      }
+
+      body {
+        display: flex;
+        flex-direction: row;
+      }
+
+      .grow {
+        flex-grow: 1;
+      }
+    </style>
+    <script type="text/javascript" src="simplepeer.min.js"></script>
+    <script type="text/javascript" src="obs.js"></script>
+    <script>
+      recievedData.registerListener((newVal) => {
+        const { genset, teams, settings } = newVal
+        const finalTeam = [teams[0], teams[1]]
+        document.documentElement.style.setProperty(
+          "--colour-scheme",
+          genset.useVOTColours ? "#fd4453" : genset.customColour
+        )
+        console.log(newVal)
+        document.getElementById("team1").innerHTML =
+          finalTeam[1].name.toUpperCase()
+        document.getElementById("team0").innerHTML =
+          finalTeam[0].name.toUpperCase()
+        document.getElementById("iconLink1").src = finalTeam[1].iconLink
+        document.getElementById("iconLink0").src = finalTeam[0].iconLink
+      })
+    </script>
+  </head>
+
+  <body>
+    <div class="grow"></div>
+    <div class="maintext">
+      <p class="cls-3" id="team0"></p>
+      <p class="cls-3">VS</p>
+      <p class="cls-3" id="team1"></p>
+    </div>
+    <div class="icons">
+      <img src="" id="iconLink0" />
+      <img src="" id="iconLink1" />
+    </div>
+  </body>
+</html>
