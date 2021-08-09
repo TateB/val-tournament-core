@@ -1,12 +1,8 @@
-import { Pane, Heading, IconButton, CaretDownIcon } from "evergreen-ui"
-import { Component, useEffect } from "react"
+import { CaretDownIcon, Heading, IconButton, Pane } from "evergreen-ui"
+import { Component } from "react"
 import "./Features.css"
 
 class RestrictedFeature extends Component {
-  constructor(props) {
-    super(props)
-  }
-
   render() {
     return (
       <Pane

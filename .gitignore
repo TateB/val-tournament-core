@@ -29,3 +29,5 @@ db.json
 certs/
 
 *.swp
+# Local Netlify folder
+.netlify

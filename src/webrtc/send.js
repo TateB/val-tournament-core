@@ -1,7 +1,6 @@
-import { connections } from "./connect"
-import db from "../db/db"
 import urlExist from "url-exist"
-import { useLiveQuery } from "dexie-react-hooks"
+import db from "../db/db"
+import { connections } from "./connect"
 
 // FORMAT:
 // TEAMS: Best Of Number, Maps Wins, Team Shorts, Team Names, iconLink, scoreArray,
@@ -31,7 +30,7 @@ export function sendScores(teams, settings, protocol = "") {
       .then((sTeam) => {
         const link = sTeam.iconLink.split("/")
         const linkName = link[link.length - 2]
-        return linkName == fName ? sTeam.iconLink : false
+        return linkName === fName ? sTeam.iconLink : false
       })
       .then((isSame) => {
         if (isSame) {
@@ -157,13 +156,14 @@ export function sendMapBans() {
 }
 
 export function initialSend(protocol) {
+  /* eslint-disable no-redeclare */
   switch (protocol) {
     case "mapbans":
       sendMapBans()
       break
     case "predictions":
       break
-    case "scores":
+    case "scores": {
       var teams
       var settings
       db.teams
@@ -173,7 +173,8 @@ export function initialSend(protocol) {
         .then((obj) => (settings = obj.settings))
         .then(() => sendScores(teams, settings, protocol))
       break
-    case "scores_start":
+    }
+    case "scores_start": {
       var teams
       var settings
       db.teams
@@ -183,7 +184,8 @@ export function initialSend(protocol) {
         .then((obj) => (settings = obj.settings))
         .then(() => sendScores(teams, settings, protocol))
       break
-    case "scores_break":
+    }
+    case "scores_break": {
       var teams
       var settings
       db.teams
@@ -193,7 +195,8 @@ export function initialSend(protocol) {
         .then((obj) => (settings = obj.settings))
         .then(() => sendScores(teams, settings, protocol))
       break
-    case "scores_characterselect":
+    }
+    case "scores_characterselect": {
       var teams
       var settings
       db.teams
@@ -203,10 +206,12 @@ export function initialSend(protocol) {
         .then((obj) => (settings = obj.settings))
         .then(() => sendScores(teams, settings, protocol))
       break
+    }
     case "timer":
       db.settings.get("timer").then((obj) => sendTimer(obj.settings))
       break
     default:
       break
   }
+  /* eslint-enable no-redeclare */
 }

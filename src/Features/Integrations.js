@@ -1,14 +1,12 @@
 import {
   Pane,
-  TextInput,
   RefreshIcon,
   Text,
   Button,
   Strong,
   IconButton,
-  CogIcon,
 } from "evergreen-ui"
-import { Component, useEffect, useState, Fragment } from "react"
+import { useEffect, Fragment } from "react"
 import Layout from "./etc/Layout"
 import db from "../db/db"
 import { twitchIcon, nightbotIcon } from "../icons/icons"

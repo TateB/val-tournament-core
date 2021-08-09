@@ -10,7 +10,6 @@ const submitPredListener = async (e) => {
   var genSet
   var predSet
   var teams
-  var userSessions
   var mapInx
 
   return db.settings
@@ -28,8 +27,6 @@ const submitPredListener = async (e) => {
     .then(() => (teams[1].score[mapInx] = parseInt(scores[1])))
     .then(() => db.teams.update(0, { score: teams[0].score }))
     .then(() => db.teams.update(1, { score: teams[1].score }))
-    .then(() => db.userSessions.bulkGet(["nightbot", "twitch"]))
-    .then((uS) => (userSessions = uS))
     .then(() => db.mapbans.update(selected.id, { played: mapInx }))
     .then(() => delay(force ? 0 : genSet.streamDelay * 1000))
     .then(() => calculateTeamInx(teams))

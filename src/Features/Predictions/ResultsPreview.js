@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react"
-import { Pane, Heading, Text, Card, Spinner } from "evergreen-ui"
+import { Card, Heading, Pane, Spinner, Text } from "evergreen-ui"
+import { useEffect, useState } from "react"
 import { twitch } from "../../apis/apis"
 import db from "../../db/db"
-import { ReactComponent as PointIcon } from "./point.svg"
 import { ReactComponent as PersonIcon } from "./person.svg"
+import { ReactComponent as PointIcon } from "./point.svg"
 
 function kNum(num) {
   return Math.abs(num) > 999
@@ -12,37 +12,38 @@ function kNum(num) {
 }
 
 function ResultsPreview(props) {
-  var fetchPredsTask
   const [minutes, setMinutes] = useState(
     Math.floor(props.predLength / 60) || "00"
   )
   const [seconds, setSeconds] = useState(props.predLength % 60)
   const [predsResult, setPredsResult] = useState([])
 
-  useEffect(
-    () =>
-      db.settings
-        .get("predictions")
-        .then((predSet) => predSet.settings)
-        .then((res) =>
-          !res.results.length > 0
-            ? (fetchPredsTask = setTimeout(
-                () =>
-                  twitch.fetchPredictions().then((resPreds) =>
-                    Promise.all([
-                      setPredsResult(resPreds),
-                      db.settings
-                        .where("name")
-                        .equals("predictions")
-                        .modify((s) => (s.settings.results = resPreds)),
-                    ])
-                  ),
-                props.predLength * 1000
-              ))
-            : setPredsResult(res.results)
-        ),
-    []
-  )
+  useEffect(() => {
+    var fetchPredsTask
+
+    db.settings
+      .get("predictions")
+      .then((predSet) => predSet.settings)
+      .then((res) =>
+        !res.results.length > 0
+          ? (fetchPredsTask = setTimeout(
+              () =>
+                twitch.fetchPredictions().then((resPreds) =>
+                  Promise.all([
+                    setPredsResult(resPreds),
+                    db.settings
+                      .where("name")
+                      .equals("predictions")
+                      .modify((s) => (s.settings.results = resPreds)),
+                  ])
+                ),
+              props.predLength * 1000
+            ))
+          : setPredsResult(res.results)
+      )
+    return () => clearTimeout(fetchPredsTask)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     if (predsResult.length !== 0) return
@@ -63,6 +64,7 @@ function ResultsPreview(props) {
       secs -= 1
     }, 1000)
     return () => clearInterval(updateTimer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   if (predsResult.length === 0)

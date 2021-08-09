@@ -1,6 +1,6 @@
+import crypto from "crypto"
 import db from "../db/db"
 import { getSpecifics } from "../db/getSpecifics"
-import crypto from "crypto"
 
 const authCheck = async () => {
   const hashes = window.location.hash.substring(1)
@@ -166,7 +166,6 @@ const setCommand = (command) => {
   var dbVars
   var userId
   var settingId
-  var processedMessages
 
   return Promise.all(requiredVars[command].map((x) => getSpecifics(x)))
     .then((dbVarsRec) => (dbVars = dbVarsRec))
@@ -200,6 +199,7 @@ const setCommand = (command) => {
 }
 
 const generateCommandText = (command, vars) => {
+  /* eslint-disable no-redeclare */
   return new Promise((resolve) => {
     switch (command) {
       case "bracket": {
@@ -242,7 +242,7 @@ const generateCommandText = (command, vars) => {
       case "maps": {
         var finalMsg = "@$(user), "
         const [picks, teams, maps, sides] = vars
-        picks.map((x, inx) => {
+        picks.forEach((x, inx) => {
           finalMsg += `${teams[x.teamPick].short.toUpperCase()} ${
             x.isBan ? "bans" : "picks"
           } ${maps[x.map].name.toUpperCase()} (${teams[
@@ -260,7 +260,7 @@ const generateCommandText = (command, vars) => {
 
         return calculateWinnerArray(teams)
           .then((winnerArr) =>
-            winnerArr.map((x, inx) => {
+            winnerArr.forEach((x, inx) => {
               finalMsg += `${teams[x].short.toUpperCase()} wins ${maps[
                 played[inx].map
               ].name.toUpperCase()} (${teams[x].score[inx]} - ${
@@ -275,6 +275,7 @@ const generateCommandText = (command, vars) => {
         throw new Error("Nightbot: Unknown command set")
       }
     }
+    /* eslint-enable no-redeclare */
   })
 }
 
@@ -288,7 +289,6 @@ const calculateWinnerArray = (teams) => {
 
 const allFunctions = {
   authCheck,
-  setCommand,
   generateLoginLink,
   getNightbotInfo,
   logout,

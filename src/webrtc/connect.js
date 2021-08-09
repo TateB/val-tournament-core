@@ -1,13 +1,9 @@
-import Peer, { prototype } from "simple-peer"
+import Peer from "simple-peer"
 import db from "../db/db"
 import { initialSend } from "./send"
 
 class ConnectionArray extends Array {
   #listeners
-
-  constructor(...items) {
-    super(...items)
-  }
 
   push(val) {
     if (val.protocol) {

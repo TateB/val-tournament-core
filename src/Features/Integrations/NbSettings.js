@@ -7,10 +7,7 @@ import {
   CogIcon,
   Heading,
   Tablist,
-  SelectField,
-  Text,
   Spinner,
-  TextInput,
   Card,
   Button,
 } from "evergreen-ui"
@@ -21,11 +18,6 @@ import db from "../../db/db"
 import { NbTabs } from "./NbTabs"
 
 export const NbSettings = () => {
-  const tabs = [
-    { name: "Commands", dbRef: "commands" },
-    { name: "Casters", dbRef: "casters" },
-    { name: "Match Info", dbRef: "matchInformation" },
-  ]
   const [settings, setSettings] = useState()
   const [isOriginal, setIsOriginal] = useState(true)
   const [isShowing, setIsShowing] = useState(false)
@@ -47,7 +39,7 @@ export const NbSettings = () => {
       (sets) =>
         sets[0] === sets[1] ? setIsOriginal(true) : setIsOriginal(false)
     )
-  }, [settings])
+  }, [settings, settingsRef])
 
   useEffect(() => {
     if (!isShowing) return
@@ -161,7 +153,7 @@ export const NbSettings = () => {
               </Button>
             </Card>
             {NbTabs.map((Tab, index) => (
-              <Tab.element
+              <Tab.Element
                 index={index}
                 selectedIndex={selectedIndex}
                 settings={settings}

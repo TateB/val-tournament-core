@@ -1,10 +1,10 @@
-import { Pane, TextInput, Select, Text, Button, Checkbox } from "evergreen-ui"
-import { Component, useEffect, useState } from "react"
-import db from "../db/db"
-import Layout from "./etc/Layout"
-import { sendScores } from "../webrtc/send"
 import { useLiveQuery } from "dexie-react-hooks"
+import { Button, Checkbox, Pane, Select, Text, TextInput } from "evergreen-ui"
+import { useEffect, useState } from "react"
 import { nightbot } from "../apis/apis"
+import db from "../db/db"
+import { sendScores } from "../webrtc/send"
+import Layout from "./etc/Layout"
 
 function Scores(props) {
   const [teams, setTeams] = useState([])
