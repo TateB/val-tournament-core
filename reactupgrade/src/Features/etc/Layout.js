@@ -1,4 +1,6 @@
+import { useLiveQuery } from "dexie-react-hooks"
 import {
+  Text,
   Pane,
   Heading,
   IconButton,
@@ -7,9 +9,11 @@ import {
   TickCircleIcon,
   FullCircleIcon,
   Position,
+  TextInput,
 } from "evergreen-ui"
 import { Component, useCallback, useEffect, useRef, useState } from "react"
 import AnimateHeight from "react-animate-height"
+import db from "../../db/db"
 import "./Features.css"
 import useEvent from "./useEvent"
 
@@ -22,6 +26,9 @@ function Layout(props) {
           {}
         )
       : null
+  )
+  const roomID = useLiveQuery(() =>
+    db.settings.get("webrtc").then((obj) => obj.settings.roomID)
   )
 
   useEffect(
@@ -44,22 +51,10 @@ function Layout(props) {
 
   const toggleShow = () => props.openAppCallback(props.name)
 
-  const calculateItems = () => {
-    if (props.protocols) {
-      props.protocols.map((p) => {
-        var circleIcon
-        if (rtcStatus[p].connected) {
-          circleIcon = <TickCircleIcon fill="#97D7BF" />
-        } else {
-          circleIcon = <TickCircleIcon color="#EE9191" />
-        }
-        return (
-          <Tooltip content={p} position={Position.TOP}>
-            circleIcon
-          </Tooltip>
-        )
-      })
-    }
+  const copyToClipboard = (p) => {
+    var copyText = document.querySelector("#" + p + "clip")
+    copyText.select()
+    document.execCommand("copy")
   }
 
   return (
@@ -84,11 +79,47 @@ function Layout(props) {
         <Pane>
           {props.protocols
             ? props.protocols.map((p) => (
-                <Tooltip content={p} position={Position.TOP}>
+                <Tooltip
+                  content={
+                    <Pane
+                      display="flex"
+                      flexDirection="column"
+                      alignItems="center"
+                      justifyContent="center"
+                    >
+                      <TextInput
+                        value={
+                          process.env.REACT_APP_URL +
+                          p +
+                          "#" +
+                          "roomID=" +
+                          roomID
+                        }
+                        id={p + "clip"}
+                        readOnly
+                        width={160}
+                      ></TextInput>
+                      <Text marginTop={8} color="white">
+                        {p}
+                      </Text>
+                    </Pane>
+                  }
+                  position={Position.TOP}
+                >
                   {rtcStatus[p] ? (
-                    <FullCircleIcon marginX={16} color="#97D7BF" />
+                    <IconButton
+                      icon={<FullCircleIcon color="#97D7BF" />}
+                      appearance="minimal"
+                      onClick={() => copyToClipboard(p)}
+                      marginX={12}
+                    />
                   ) : (
-                    <FullCircleIcon marginX={16} color="#EE9191" />
+                    <IconButton
+                      icon={<FullCircleIcon color="#EE9191" />}
+                      appearance="minimal"
+                      onClick={() => copyToClipboard(p)}
+                      marginX={12}
+                    />
                   )}
                 </Tooltip>
               ))

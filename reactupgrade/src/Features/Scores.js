@@ -47,7 +47,7 @@ function Scores(props) {
       if (otherScore > 12 && otherScore + 2 < score) score = otherScore + 2
 
       var prevTeams = [...prevState]
-      prevTeams[team].score[inx] = parseInt(score) || ""
+      prevTeams[team].score[inx] = parseInt(score) || 0
       return prevTeams
     })
   }
@@ -75,21 +75,22 @@ function Scores(props) {
       .then(() => db.teams.update(1, { score: teams[1].score }))
       .then(() => db.settings.update("scores", { settings: settings }))
       .then(() => Math.max(...teams.map((tr) => tr.score.indexOf(0))))
+      .then((hasScores) => (hasScores === -1 ? 3 : hasScores))
       .then((hasScores) =>
-        pickedMaps.map((m, inx) => {
-          if (inx < hasScores) {
-            console.log(m.id)
-            return m.id
-          }
-        })
+        Promise.all(
+          pickedMaps.map((m, inx) => (inx < hasScores ? m.id : undefined))
+        )
       )
       .then((ids) => ids.filter((x) => x !== undefined))
       .then((ids) =>
-        ids.map((x, inx) => {
-          console.log(x, inx)
-          return db.mapbans.update(x, { played: inx })
-        })
+        Promise.all(ids.map((x, inx) => db.mapbans.update(x, { played: inx })))
       )
+      .then(() =>
+        db.mapbans
+          .toArray()
+          .then((arr) => arr.filter((x) => x.played !== undefined))
+      )
+      .then((res) => console.log("RESULTS FOR Q", res))
       .then(() => nightbot.setCommands(["maps", "score"]))
       .then(() => sendScores(teams, settings))
 
