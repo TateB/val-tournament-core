@@ -1,14 +1,30 @@
 import { useLiveQuery } from "dexie-react-hooks"
-import { Pane, IconButton, MoonIcon, Heading } from "evergreen-ui"
-import { useState, useEffect } from "react"
+import {
+  DoubleChevronUpIcon,
+  Heading,
+  IconButton,
+  MoonIcon,
+  Pane,
+  RefreshIcon,
+  Text,
+  Tooltip,
+} from "evergreen-ui"
+import { useEffect, useState } from "react"
 import db from "../db/db"
+import { sendPredictions, sendScores, togglePredictions } from "../webrtc/send"
 
 export function FtHeader(props) {
   const [mapScores, setMapScores] = useState([0, 0])
   const useDarkMode = useLiveQuery(() =>
     db.settings.get("general").then((genset) => genset.settings.useDarkMode)
   )
+  const reversed = useLiveQuery(() =>
+    db.settings.get("scores").then((genset) => genset.settings.reversed)
+  )
   const teams = useLiveQuery(() => db.teams.bulkGet([0, 1]))
+  const predSet = useLiveQuery(() =>
+    db.settings.get("predictions").then((obj) => obj.settings)
+  )
 
   useEffect(() => {
     if (teams === undefined) return
@@ -30,11 +46,27 @@ export function FtHeader(props) {
       .equals("general")
       .modify({ "settings.useDarkMode": !useDarkMode })
 
-  if (teams === undefined) return null
+  const flipScoreboard = () =>
+    db.settings
+      .where("name")
+      .equals("scores")
+      .modify({ "settings.reversed": !reversed })
+      .then(() => sendScores())
+      .then(() => sendPredictions())
+
+  const togglePredictionsShowing = () =>
+    db.settings
+      .where("name")
+      .equals("predictions")
+      .modify({ "settings.showing": !predSet.showing })
+      .then(() => togglePredictions())
+
+  if (teams === undefined || predSet === undefined) return null
 
   return (
     <Pane
       height="15vh"
+      minHeight="200px"
       display="flex"
       flexDirection="row"
       alignItems="center"
@@ -45,14 +77,51 @@ export function FtHeader(props) {
         <Pane width={40}></Pane>
       </Pane>
       <Pane
-        flexGrow="1"
+        width="1000px"
         display="flex"
         alignItems="center"
         justifyContent="center"
+        flexDirection="column"
+        height="100%"
       >
-        <Heading size={900}>
-          {teams[0].short} ({mapScores[0]}) - ({mapScores[1]}) {teams[1].short}
-        </Heading>
+        <Pane
+          flexGrow="1"
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Heading size={900}>
+            {teams[0].short} ({mapScores[0]}) - ({mapScores[1]}){" "}
+            {teams[1].short}
+          </Heading>
+        </Pane>
+        <Pane width="100%">
+          <Tooltip
+            content={
+              <Pane>
+                <Text color="white">Flip Scoreboard</Text>
+                <br />
+                <Text color="white">
+                  Currently: {reversed ? teams[1].short : teams[0].short} starts
+                  on DEF
+                </Text>
+              </Pane>
+            }
+          >
+            <IconButton
+              icon={RefreshIcon}
+              onClick={flipScoreboard}
+              marginRight={8}
+            />
+          </Tooltip>
+          <Tooltip content="Toggle Predictions Showing">
+            <IconButton
+              disabled={!predSet.available}
+              icon={DoubleChevronUpIcon}
+              onClick={togglePredictionsShowing}
+            />
+          </Tooltip>
+        </Pane>
       </Pane>
       <Pane
         flexGrow="1"

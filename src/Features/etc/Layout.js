@@ -66,7 +66,7 @@ function Layout(props) {
       width={1000}
       padding={20}
       marginY={16}
-      background={bodyShowing ? "tint1" : ""}
+      background={props.disabled ? "tint1" : bodyShowing ? "tint1" : ""}
     >
       <Pane
         display="flex"
@@ -75,7 +75,9 @@ function Layout(props) {
         width="100%"
         alignItems="center"
       >
-        <Heading>{props.name}</Heading>
+        <Heading color={props.disabled ? "#8f95b2" : undefined}>
+          {props.name}
+        </Heading>
         <Pane>
           {props.protocols
             ? props.protocols.map((p) => (
@@ -129,6 +131,7 @@ function Layout(props) {
             icon={CaretDownIcon}
             appearance="minimal"
             onClick={toggleShow}
+            disabled={props.disabled}
           />
         </Pane>
       </Pane>

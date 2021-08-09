@@ -6,7 +6,7 @@ import { connections } from "./connect"
 // TEAMS: Best Of Number, Maps Wins, Team Shorts, Team Names, iconLink, scoreArray,
 // SETTINGS: reversed, useVOTColours, useCustomIcon
 
-export function sendScores(teams, settings, protocol = "") {
+export function sendScores(protocol = "") {
   function readFile(file) {
     return new Promise((resolve, reject) => {
       var fr = new FileReader()
@@ -65,15 +65,23 @@ export function sendScores(teams, settings, protocol = "") {
       })
   }
 
-  db.settings
-    .get("general")
-    .then((genset) => {
-      return {
-        useVOTColors: genset.settings.useVOTColours,
-        customColour: genset.settings.customColour,
-      }
-    })
-    .then((genset) => {
+  var teams, settings, genset
+
+  db.teams
+    .bulkGet([0, 1])
+    .then((t) => (teams = t))
+    .then(() => db.settings.get("general"))
+    .then((genset) => ({
+      useVOTColors: genset.settings.useVOTColours,
+      customColour: genset.settings.customColour,
+    }))
+    .then((gs) => (genset = gs))
+    .then(() => db.settings.get("scores"))
+    .then((scSet) => ({
+      reversed: scSet.settings.reversed,
+    }))
+    .then((scSet) => (settings = scSet))
+    .then(() => {
       const mapScores = teams[0].score.reduce(
         (acc, curval, i) => {
           const other = teams[1].score[i]
@@ -106,31 +114,37 @@ export function sendScores(teams, settings, protocol = "") {
 }
 
 export function setNewTeams(teams) {
-  db.settings.get("scores").then((scset) => sendScores(teams, scset.settings))
+  sendScores()
 }
 
 export function sendTimer(settings) {
   return connections
-    .find((x) => x.protocol === "timer")
-    .peer.send(JSON.stringify(settings))
+    .find((x) => x.protocol === "timer" && x.connected === true)
+    .then((conn) => (conn ? conn.peer.send(JSON.stringify(settings)) : null))
 }
 
 export function sendTimerStart() {
   return connections
-    .find((x) => x.protocol === "timer")
-    .peer.send(JSON.stringify({ start: true }))
+    .find((x) => x.protocol === "timer" && x.connected === true)
+    .then((conn) =>
+      conn ? conn.peer.send(JSON.stringify({ start: true })) : null
+    )
 }
 
 export function sendTimerStop() {
   return connections
-    .find((x) => x.protocol === "timer")
-    .peer.send(JSON.stringify({ stop: true }))
+    .find((x) => x.protocol === "timer" && x.connected === true)
+    .then((conn) =>
+      conn ? conn.peer.send(JSON.stringify({ stop: true })) : null
+    )
 }
 
 export function sendTimerReset() {
   return connections
-    .find((x) => x.protocol === "timer")
-    .peer.send(JSON.stringify({ reset: true }))
+    .find((x) => x.protocol === "timer" && x.connected === true)
+    .then((conn) =>
+      conn ? conn.peer.send(JSON.stringify({ reset: true })) : null
+    )
 }
 
 export function sendMapBans() {
@@ -148,11 +162,54 @@ export function sendMapBans() {
     .then(() => db.sides.toArray())
     .then((arr) => arr.map((x) => x.name))
     .then((arr) => (sides = arr))
-    .then(() => connections.find((x) => x.protocol === "mapbans"))
+    .then(() =>
+      connections.find((x) => x.protocol === "mapbans" && x.connected === true)
+    )
     .then((conn) =>
-      conn.peer.send(JSON.stringify({ teams, mapbans, genset, maps, sides }))
+      conn
+        ? conn.peer.send(
+            JSON.stringify({ teams, mapbans, genset, maps, sides })
+          )
+        : null
     )
     .catch(() => console.error("couldn't send to peer"))
+}
+
+export function sendPredictions() {
+  var teams, predictions, reversed
+  return db.teams
+    .bulkGet([0, 1])
+    .then((arr) => (teams = arr))
+    .then(() => db.settings.get("predictions"))
+    .then((preds) => (predictions = preds.settings.results))
+    .then(() => db.settings.get("scores"))
+    .then((scSet) => (reversed = scSet.settings.reversed))
+    .then(() =>
+      connections.find(
+        (x) => x.protocol === "predictions" && x.connected === true
+      )
+    )
+    .then((conn) =>
+      conn
+        ? conn.peer.send(JSON.stringify({ teams, predictions, reversed }))
+        : null
+    )
+}
+
+export function togglePredictions() {
+  var isShowing
+
+  return db.settings
+    .get("predictions")
+    .then((predSet) => (isShowing = predSet.settings.showing))
+    .then(() =>
+      connections.find(
+        (x) => x.protocol === "predictions" && x.connected === true
+      )
+    )
+    .then((conn) =>
+      conn ? conn.peer.send(JSON.stringify({ show: isShowing })) : null
+    )
 }
 
 export function initialSend(protocol) {
@@ -162,49 +219,22 @@ export function initialSend(protocol) {
       sendMapBans()
       break
     case "predictions":
+      sendPredictions()
       break
     case "scores": {
-      var teams
-      var settings
-      db.teams
-        .bulkGet([0, 1])
-        .then((array) => (teams = array))
-        .then(() => db.settings.get("scores"))
-        .then((obj) => (settings = obj.settings))
-        .then(() => sendScores(teams, settings, protocol))
+      sendScores(protocol)
       break
     }
     case "scores_start": {
-      var teams
-      var settings
-      db.teams
-        .bulkGet([0, 1])
-        .then((array) => (teams = array))
-        .then(() => db.settings.get("scores"))
-        .then((obj) => (settings = obj.settings))
-        .then(() => sendScores(teams, settings, protocol))
+      sendScores(protocol)
       break
     }
     case "scores_break": {
-      var teams
-      var settings
-      db.teams
-        .bulkGet([0, 1])
-        .then((array) => (teams = array))
-        .then(() => db.settings.get("scores"))
-        .then((obj) => (settings = obj.settings))
-        .then(() => sendScores(teams, settings, protocol))
+      sendScores(protocol)
       break
     }
     case "scores_characterselect": {
-      var teams
-      var settings
-      db.teams
-        .bulkGet([0, 1])
-        .then((array) => (teams = array))
-        .then(() => db.settings.get("scores"))
-        .then((obj) => (settings = obj.settings))
-        .then(() => sendScores(teams, settings, protocol))
+      sendScores(protocol)
       break
     }
     case "timer":

@@ -2,6 +2,7 @@ import { Card, Heading, Pane, Spinner, Text } from "evergreen-ui"
 import { useEffect, useState } from "react"
 import { twitch } from "../../apis/apis"
 import db from "../../db/db"
+import { sendPredictions } from "../../webrtc/send"
 import { ReactComponent as PersonIcon } from "./person.svg"
 import { ReactComponent as PointIcon } from "./point.svg"
 
@@ -28,15 +29,18 @@ function ResultsPreview(props) {
         !res.results.length > 0
           ? (fetchPredsTask = setTimeout(
               () =>
-                twitch.fetchPredictions().then((resPreds) =>
-                  Promise.all([
-                    setPredsResult(resPreds),
-                    db.settings
-                      .where("name")
-                      .equals("predictions")
-                      .modify((s) => (s.settings.results = resPreds)),
-                  ])
-                ),
+                twitch
+                  .fetchPredictions()
+                  .then((resPreds) =>
+                    Promise.all([
+                      setPredsResult(resPreds),
+                      db.settings
+                        .where("name")
+                        .equals("predictions")
+                        .modify((s) => (s.settings.results = resPreds)),
+                    ])
+                  )
+                  .then(() => sendPredictions()),
               props.predLength * 1000
             ))
           : setPredsResult(res.results)

@@ -15,6 +15,11 @@ function Scores(props) {
 
   const teamReference = useLiveQuery(() => db.teams.bulkGet([0, 1]))
   const mapbansRef = useLiveQuery(() => db.mapbans.toArray())
+  const isInPrediction = useLiveQuery(() =>
+    db.settings
+      .get("predictions")
+      .then((obj) => !obj.settings.available && !obj.settings.willSend)
+  )
 
   useEffect(() => {
     db.teams.bulkGet([0, 1]).then((scoresarray) => {
@@ -92,7 +97,7 @@ function Scores(props) {
       )
       .then((res) => global.log("RESULTS FOR Q", res))
       .then(() => nightbot.setCommands(["maps", "score"]))
-      .then(() => sendScores(teams, settings))
+      .then(() => sendScores())
 
   const clearScores = () => {
     const clearArray = pickedMaps.fill(0)
@@ -101,7 +106,7 @@ function Scores(props) {
       .modify({ score: clearArray })
       .then(() => db.mapbans.toCollection().modify({ played: undefined }))
       .then(() => nightbot.setCommands(["maps", "score"]))
-      .then(() => sendScores(teamReference, settings))
+      .then(() => sendScores())
   }
 
   return (
@@ -115,6 +120,7 @@ function Scores(props) {
         "scores_break",
         "scores_characterselect",
       ]}
+      disabled={!isInPrediction}
     >
       <Pane display="flex" flexDirection="column">
         {pickedMaps.map((map, inx) => (

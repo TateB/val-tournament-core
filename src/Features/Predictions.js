@@ -13,6 +13,9 @@ function Predictions(props) {
   const pickedMaps = useLiveQuery(() =>
     db.mapbans.where("isBan").equals(0).toArray()
   )
+  const playedMaps = useLiveQuery(() =>
+    db.mapbans.toArray().then((arr) => arr.filter((x) => x.played >= 0))
+  )
   const predSettings = useLiveQuery(() => db.settings.get("predictions"))
   const [loading, setLoading] = useState(false)
 
@@ -25,6 +28,7 @@ function Predictions(props) {
     !teams ||
     !maps ||
     !predSettings ||
+    !playedMaps ||
     pickedMaps.length === 0 ||
     teams.length === 0 ||
     maps.length === 0
@@ -44,6 +48,7 @@ function Predictions(props) {
       openAppCallback={props.openAppCallback}
       openedApp={props.openedApp}
       protocols={["predictions"]}
+      disabled={playedMaps.length === pickedMaps.length}
     >
       <States
         cState={cState}
