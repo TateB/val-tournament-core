@@ -17,7 +17,7 @@ const recievedData = {
 }
 
 var currentPeer
-const wsURI = "ws://localhost:6503/?roomID=" + roomID
+const wsURI = "wss://signal.val.tatebulic.com.au:443/?roomID=" + roomID
 const websocket = new WebSocket(wsURI, protocol)
 websocket.onopen = () => {
   currentPeer = createPeer()
