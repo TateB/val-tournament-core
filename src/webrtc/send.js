@@ -118,33 +118,31 @@ export function setNewTeams(teams) {
 }
 
 export function sendTimer(settings) {
-  return connections
-    .find((x) => x.protocol === "timer" && x.connected === true)
-    .then((conn) => (conn ? conn.peer.send(JSON.stringify(settings)) : null))
+  const timer = connections.find(
+    (x) => x.protocol === "timer" && x.connected === true
+  )
+  return timer ? timer.peer.send(JSON.stringify(settings)) : null
 }
 
 export function sendTimerStart() {
-  return connections
-    .find((x) => x.protocol === "timer" && x.connected === true)
-    .then((conn) =>
-      conn ? conn.peer.send(JSON.stringify({ start: true })) : null
-    )
+  const timer = connections.find(
+    (x) => x.protocol === "timer" && x.connected === true
+  )
+  return timer ? timer.peer.send(JSON.stringify({ start: true })) : null
 }
 
 export function sendTimerStop() {
-  return connections
-    .find((x) => x.protocol === "timer" && x.connected === true)
-    .then((conn) =>
-      conn ? conn.peer.send(JSON.stringify({ stop: true })) : null
-    )
+  const timer = connections.find(
+    (x) => x.protocol === "timer" && x.connected === true
+  )
+  return timer ? timer.peer.send(JSON.stringify({ stop: true })) : null
 }
 
 export function sendTimerReset() {
-  return connections
-    .find((x) => x.protocol === "timer" && x.connected === true)
-    .then((conn) =>
-      conn ? conn.peer.send(JSON.stringify({ reset: true })) : null
-    )
+  const timer = connections.find(
+    (x) => x.protocol === "timer" && x.connected === true
+  )
+  return timer ? timer.peer.send(JSON.stringify({ reset: true })) : null
 }
 
 export function sendMapBans() {

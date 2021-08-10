@@ -1,3 +1,11 @@
 [[redirects]]
     from = "/obs/*"
     to = "/obs/:feature.html"
+
+[[redirects]]
+    from ="/twitch/*"
+    to = "/index.html"
+
+[[redirects]]
+    from = "/nightbot/*"
+    to = "/index.html"
