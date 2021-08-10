@@ -153,7 +153,7 @@ export function sendMapBans() {
     .then(() => db.teams.toArray())
     .then((arr) => (teams = arr))
     .then(() => db.settings.get("general"))
-    .then((arr) => (genset = arr))
+    .then((arr) => (genset = arr.settings))
     .then(() => db.maps.toArray())
     .then((arr) => arr.map((x) => x.name))
     .then((arr) => (maps = arr))
