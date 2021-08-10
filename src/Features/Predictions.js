@@ -6,7 +6,7 @@ import States from "./Predictions/States"
 
 function Predictions(props) {
   const [cState, setCState] = useState(0)
-  const teams = useLiveQuery(() => db.teams.bulkGet([0, 1]))
+  const teams = useLiveQuery(() => db.teams.bulkGet([0, 1, 2]))
   const maps = useLiveQuery(() =>
     db.maps.toArray((arr) => arr.map((x) => x.name))
   )

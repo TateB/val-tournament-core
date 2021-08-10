@@ -137,6 +137,11 @@
         height: 520px;
       }
 
+      .autoPickedBo1 .bannedMap:first-child,
+      .autoPickedBo1 .bannedMap:first-child .backgroundImage {
+        height: 600px;
+      }
+
       .twocolumn .autoban {
         position: fixed;
         margin-top: 620px;
@@ -151,6 +156,10 @@
         margin-top: 400px;
       }
 
+      .autoPickedBo1 .bannedMap:first-child .info {
+        margin-top: 475px;
+      }
+
       .nodisplay {
         display: none !important;
       }
@@ -159,6 +168,18 @@
         margin-top: 680px;
         margin-left: 25px;
         line-height: 25px;
+      }
+
+      .autoPickedBo1 .bannedMap .info {
+        min-width: 120px;
+      }
+
+      .autoPickedBo1.bannedMaps {
+        margin-right: 150px;
+      }
+
+      .autoPickedBo1.bannedMaps .bannedMap {
+        margin-left: 50px;
       }
 
       * {
@@ -243,7 +264,10 @@
             const mapName = maps[map.map]
             const sidePick = sides[map.sidePick]
             const teamPick = teams[map.teamPick].name
-            const enemyTeam = teams[map.teamPick === 1 ? 0 : 1].name
+            const enemyTeam =
+              pickedMaps.length === autobanMap.length
+                ? teams[bannedMaps[bannedMaps.length - 2].teamPick].name
+                : teams[map.teamPick === 1 ? 0 : 1].name
             const pickedDiv = document.getElementById("main")
             const mapEl = document.createElement("div")
             const mapTitleEl = document.createElement("h1")
@@ -299,16 +323,20 @@
             bannedDiv.classList.add("twocolumn")
           }
 
-          const spacerInnerEl = document.createElement("div")
-          const autobanEl = document.createElement("h3")
-          const autobanText = document.createTextNode(
-            maps[autobanMap[0].map] + " AUTOBANNED"
-          )
-          spacerInnerEl.setAttribute("class", "spacer")
-          autobanEl.setAttribute("class", "autoban")
-          autobanEl.appendChild(autobanText)
-          bannedDiv.appendChild(spacerInnerEl)
-          bannedDiv.appendChild(autobanEl)
+          if (pickedMaps.length !== autobanMap.length) {
+            const spacerInnerEl = document.createElement("div")
+            const autobanEl = document.createElement("h3")
+            const autobanText = document.createTextNode(
+              maps[autobanMap[0].map] + " AUTOBANNED"
+            )
+            spacerInnerEl.setAttribute("class", "spacer")
+            autobanEl.setAttribute("class", "autoban")
+            autobanEl.appendChild(autobanText)
+            bannedDiv.appendChild(spacerInnerEl)
+            bannedDiv.appendChild(autobanEl)
+          } else {
+            bannedDiv.classList.add("autoPickedBo1")
+          }
         }
       })
     </script>
