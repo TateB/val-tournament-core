@@ -1,5 +1,5 @@
 import { useLiveQuery } from "dexie-react-hooks"
-import { Pane, Textarea, Button } from "evergreen-ui"
+import { Button, Pane, Textarea } from "evergreen-ui"
 import { useEffect, useState } from "react"
 import db from "../db/db"
 import { resetMapBans } from "../db/resetToDefault"
@@ -26,7 +26,10 @@ function MapBans(props) {
   const sendToDb = () => {
     if (vetoLog === "") {
       const savedMapBans = dbMapBans
-      db.mapbans.clear().then(() => db.mapbans.bulkAdd(savedMapBans))
+      db.mapbans
+        .clear()
+        .then(() => db.mapbans.bulkAdd(savedMapBans))
+        .then(() => sendMapBans())
     } else {
       textInput(dbTeams, vetoLog, mapsArray, sides)
         .then((recievedBans) => setDbMapBans(recievedBans))
