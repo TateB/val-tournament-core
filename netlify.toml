@@ -5,7 +5,9 @@
 [[redirects]]
     from ="/twitch/*"
     to = "/index.html"
+    status = 200
 
 [[redirects]]
     from = "/nightbot/*"
     to = "/index.html"
+    status = 200
