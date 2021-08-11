@@ -182,6 +182,14 @@
         margin-left: 50px;
       }
 
+      .iframemap {
+        position: absolute;
+        z-index: -10;
+        object-fit: cover;
+        width: inherit;
+        height: inherit;
+      }
+
       * {
         text-transform: uppercase;
       }
@@ -189,6 +197,7 @@
     <script type="text/javascript" src="simplepeer.min.js"></script>
     <script type="text/javascript" src="obs.js"></script>
     <script>
+      const isIframe = window.location !== window.parent.location
       recievedData.registerListener((newVal) => {
         const { teams, mapbans, genset, maps, sides } = newVal
         const finalTeam = [teams[0], teams[1]]
@@ -242,7 +251,9 @@
               "style",
               "background: url('/obs/maps/" +
                 mapName +
-                ".png');background-position: center;background-size: cover;"
+                (isIframe
+                  ? "-baniframe.png');background-position: center;background-size: cover;"
+                  : ".png');background-position: center;background-size: cover;")
             )
             bgImgEl.setAttribute("class", "backgroundImage")
             infoEl.setAttribute("class", "info")
@@ -289,12 +300,14 @@
 
             spacerEl.setAttribute("class", "spacer")
             mapEl.setAttribute("class", "map")
-            mapEl.setAttribute(
-              "style",
-              "background: url('/obs/maps/" +
-                mapName +
-                ".png');background-position: center;background-size: cover;"
-            )
+            if (!isIframe) {
+              mapEl.setAttribute(
+                "style",
+                "background: url('/obs/maps/" +
+                  mapName +
+                  ".png');background-position: center;background-size: cover;"
+              )
+            }
             infoEl.setAttribute("class", "info")
             pickEl.setAttribute("class", "pick")
             spanEl.setAttribute("class", "highlight")
@@ -315,6 +328,12 @@
             mapEl.appendChild(mapTitleEl)
             mapEl.appendChild(spacerEl)
             mapEl.appendChild(infoEl)
+            if (isIframe) {
+              const backgroundImg = document.createElement("img")
+              backgroundImg.setAttribute("src", "/obs/maps/" + mapName + ".png")
+              backgroundImg.setAttribute("class", "iframemap")
+              mapEl.appendChild(backgroundImg)
+            }
 
             pickedDiv.appendChild(mapEl)
           })

@@ -49,6 +49,12 @@ function Layout(props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  useEffect(() => {
+    if (!props.rtcState) return
+    props.rtcState(rtcStatus)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rtcStatus])
+
   const toggleShow = () => props.openAppCallback(props.name)
 
   const copyToClipboard = (p) => {
