@@ -1,5 +1,5 @@
-import db from "./db"
 import { v4 as uuidv4 } from "uuid"
+import db from "./db"
 
 const makeDefaults = async () => {
   await db.maps.bulkPut([
@@ -60,6 +60,7 @@ const makeDefaults = async () => {
         useCustomIcon: false,
         customIcon: "",
         useDarkMode: false,
+        needsIntro: true,
       },
     },
     {

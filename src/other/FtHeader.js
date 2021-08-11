@@ -12,6 +12,7 @@ import {
 import { useEffect, useState } from "react"
 import db from "../db/db"
 import { sendPredictions, sendScores, togglePredictions } from "../webrtc/send"
+import { Documentation } from "./Documentation"
 
 export function FtHeader(props) {
   const [mapScores, setMapScores] = useState([0, 0])
@@ -74,7 +75,7 @@ export function FtHeader(props) {
       width="100%"
     >
       <Pane flexGrow="1">
-        <Pane width={40}></Pane>
+        <Pane width={80}></Pane>
       </Pane>
       <Pane
         width="1000px"
@@ -130,6 +131,7 @@ export function FtHeader(props) {
         justifyContent="flex-end"
         height="100%"
       >
+        <Documentation />
         <IconButton
           icon={MoonIcon}
           appearance="minimal"

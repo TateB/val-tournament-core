@@ -1,20 +1,16 @@
-import { useState, Fragment } from "react"
-import { Pane, Button, Select } from "evergreen-ui"
+import { Button, Pane, Text } from "evergreen-ui"
+import { Fragment } from "react"
 
 function InProgress() {
-  const [pickedMaps] = useState(["Ascent", "Icebox", "Haven"])
-
   return (
     <Fragment>
       <Pane display="flex" flexDirection="row">
-        <Select onChange={(event) => alert(event.target.value)}>
-          {pickedMaps.map((pMap) => (
-            <option value={pMap.toLowerCase()}>{pMap}</option>
-          ))}
-        </Select>
+        <Text>Submission in progress...</Text>
       </Pane>
       <Pane display="flex" flexDirection="row" marginTop={8}>
-        <Button intent="success">Create</Button>
+        <Button intent="success" disabled>
+          Create
+        </Button>
         <Pane flexGrow="1"></Pane>
       </Pane>
     </Fragment>
