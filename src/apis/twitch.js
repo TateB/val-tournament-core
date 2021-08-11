@@ -163,7 +163,7 @@ const submitPrediction = (selected, predLength) => {
   var map, teams, twitch
   return db.maps
     .toArray((arr) => {
-      return (map = arr[selected.id])
+      return (map = arr[selected.map])
     })
     .then(() => db.teams.bulkGet([0, 1]))
     .then((arr) => (teams = arr))
