@@ -5,6 +5,7 @@ import db from "../db/db"
 import { resetMapBans } from "../db/resetToDefault"
 import { sendMapBans } from "../webrtc/send"
 import Layout from "./etc/Layout"
+import { DownloadAsPNG } from "./MapBans/DownloadAsPNG"
 import ManualInput from "./MapBans/ManualInput"
 import Preview from "./MapBans/Preview"
 import textInput from "./MapBans/textInput"
@@ -16,6 +17,7 @@ function MapBans(props) {
   const mapBansRef = useLiveQuery(() => db.mapbans.toArray())
   const [vetoLog, setVetoLog] = useState("")
   const [sides, setSides] = useState([])
+  const [rtcState, setRtcState] = useState([])
 
   useEffect(() => {
     db.mapbans.toArray().then((arr) => setDbMapBans(arr))
@@ -26,12 +28,12 @@ function MapBans(props) {
   const sendToDb = () => {
     if (vetoLog === "") {
       const savedMapBans = dbMapBans
-      db.mapbans
+      return db.mapbans
         .clear()
         .then(() => db.mapbans.bulkAdd(savedMapBans))
         .then(() => sendMapBans())
     } else {
-      textInput(dbTeams, vetoLog, mapsArray, sides)
+      return textInput(dbTeams, vetoLog, mapsArray, sides)
         .then((recievedBans) => setDbMapBans(recievedBans))
         .then(() => setVetoLog(""))
         .then(() => sendMapBans())
@@ -48,6 +50,7 @@ function MapBans(props) {
       openAppCallback={props.openAppCallback}
       openedApp={props.openedApp}
       protocols={["mapbans"]}
+      rtcState={setRtcState}
     >
       <Pane display="flex" width="100%" flexDirection="column">
         <Pane display="flex" flexDirection="row">
@@ -65,6 +68,7 @@ function MapBans(props) {
           <Button intent="success" marginRight="8px" onClick={sendToDb}>
             Submit
           </Button>
+          <DownloadAsPNG sendToDb={sendToDb} rtcState={rtcState} />
           <Pane flexGrow="1"></Pane>
           <ManualInput
             mapBans={dbMapBans}
