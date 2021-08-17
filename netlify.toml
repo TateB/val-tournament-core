@@ -11,3 +11,6 @@
     from = "/nightbot/*"
     to = "/index.html"
     status = 200
+
+[context.branch-deploy]
+    NODE_ENV = "development"

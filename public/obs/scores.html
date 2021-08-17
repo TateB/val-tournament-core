@@ -18,7 +18,7 @@
     <script type="text/javascript" src="obs.js"></script>
     <script>
       recievedData.registerListener((newVal) => {
-        const { genset, teams, settings } = newVal
+        const { genset, teams, settings, boAmount } = newVal
         const finalTeam = settings.reversed
           ? [teams[1], teams[0]]
           : [teams[0], teams[1]]
@@ -26,8 +26,7 @@
           "--colour-scheme",
           genset.useVOTColours ? "#fd4453" : genset.customColour
         )
-        document.getElementById("bestOf").innerHTML =
-          "BO" + teams[0].score.length
+        document.getElementById("bestOf").innerHTML = "BO" + boAmount
         document.getElementById("rightTeam").innerHTML =
           finalTeam[1].short.toUpperCase()
         document.getElementById("leftTeam").innerHTML =
