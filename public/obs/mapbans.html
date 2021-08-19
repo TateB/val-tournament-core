@@ -15,6 +15,7 @@
         flex-direction: row;
         justify-content: space-around;
         font-family: "Poppins";
+        overflow: hidden;
       }
       .map {
         margin-top: 50px;
@@ -190,6 +191,22 @@
         height: inherit;
       }
 
+      .hidden {
+        opacity: 0;
+        margin-top: -200px !important;
+      }
+
+      .hiddenAutoban {
+        opacity: 0;
+        margin-bottom: 100px !important;
+      }
+
+      .bannedMap,
+      .map,
+      #autobantext {
+        transition: all 0.3s ease-out;
+      }
+
       * {
         text-transform: uppercase;
       }
@@ -350,12 +367,58 @@
             )
             spacerInnerEl.setAttribute("class", "spacer")
             autobanEl.setAttribute("class", "autoban")
+            autobanEl.setAttribute("id", "autobantext")
             autobanEl.appendChild(autobanText)
             bannedDiv.appendChild(spacerInnerEl)
             bannedDiv.appendChild(autobanEl)
           } else {
             bannedDiv.classList.add("autoPickedBo1")
           }
+
+          if (document.visibilityState !== "visible") {
+            const mapDivs = document.querySelectorAll(".bannedMap, .map")
+            for (const mapDiv of mapDivs) {
+              mapDiv.classList.add("nodisplay")
+              mapDiv.classList.add("hidden")
+            }
+            document
+              .getElementById("autobantext")
+              .classList.add("nodisplay", "hiddenAutoban")
+          }
+
+          window.addEventListener("obsSourceActiveChanged", (evt) => {
+            if (evt.detail.active) {
+              setTimeout(() => {
+                document
+                  .getElementById("autobantext")
+                  .classList.remove("nodisplay")
+                const mapDivs = document.querySelectorAll(".bannedMap, .map")
+                for (const [inx, mapDiv] of mapDivs.entries()) {
+                  mapDiv.classList.remove("nodisplay")
+                  setTimeout(
+                    () => mapDiv.classList.remove("hidden"),
+                    200 * (inx + 1)
+                  )
+                }
+                setTimeout(
+                  () =>
+                    document
+                      .getElementById("autobantext")
+                      .classList.remove("hiddenAutoban"),
+                  200 * (mapDivs.length + 1)
+                )
+              }, 850)
+            } else {
+              const mapDivs = document.querySelectorAll(".bannedMap, .map")
+              for (const mapDiv of mapDivs) {
+                mapDiv.classList.add("nodisplay")
+                mapDiv.classList.add("hidden")
+              }
+              document
+                .getElementById("autobantext")
+                .classList.add("nodisplay", "hiddenAutoban")
+            }
+          })
         }
       })
     </script>
