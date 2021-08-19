@@ -204,7 +204,7 @@
       .bannedMap,
       .map,
       #autobantext {
-        transition: all 0.3s ease-in-out;
+        transition: all 0.3s ease-out;
       }
 
       * {
@@ -397,7 +397,7 @@
                   mapDiv.classList.remove("nodisplay")
                   setTimeout(
                     () => mapDiv.classList.remove("hidden"),
-                    300 * (inx + 1)
+                    200 * (inx + 1)
                   )
                 }
                 setTimeout(
@@ -405,7 +405,7 @@
                     document
                       .getElementById("autobantext")
                       .classList.remove("hiddenAutoban"),
-                  300 * (mapDivs.length + 1)
+                  200 * (mapDivs.length + 1)
                 )
               }, 850)
             } else {
