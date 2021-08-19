@@ -103,7 +103,7 @@ const generateLoginLink = () => {
     client_id: process.env.REACT_APP_TWITCH_KEY,
     redirect_uri: process.env.REACT_APP_URL + "twitch/",
     response_type: "token id_token",
-    scope: "channel:manage:predictions openid",
+    scope: "channel:manage:predictions channel:edit:commercial openid",
     nonce: nonce,
   })
 
@@ -329,6 +329,35 @@ const fetchPredictions = () => {
     )
 }
 
+const submitAd = (time) => {
+  var twitch
+  return db.userSessions
+    .get("twitch")
+    .then((obj) => (twitch = obj))
+    .then(() => isAuthed(twitch))
+    .then(() => ({
+      broadcaster_id: twitch.session.userId,
+      length: time,
+    }))
+    .then((sendBody) =>
+      standardFetch(
+        twitch.session.accessToken,
+        "channels/commercial",
+        "POST",
+        sendBody
+      )
+    )
+    .then((res) => checkForErrors(res))
+    .then((json) =>
+      json.data[0].message !== ""
+        ? console.error(
+            "Error submitting ad to twitch: " + json.data[0].message
+          )
+        : undefined
+    )
+    .catch((err) => console.error(err))
+}
+
 const allFunctions = {
   authCheck,
   generateLoginLink,
@@ -338,6 +367,7 @@ const allFunctions = {
   cancelPrediction,
   fetchPredictions,
   submitPredictionResult,
+  submitAd,
 }
 
 export default allFunctions

@@ -1,11 +1,14 @@
 import { useLiveQuery } from "dexie-react-hooks"
 import {
+  Dialog,
+  DollarIcon,
   DoubleChevronUpIcon,
   Heading,
   IconButton,
   MoonIcon,
   Pane,
   RefreshIcon,
+  Select,
   Text,
   Tooltip,
 } from "evergreen-ui"
@@ -26,6 +29,11 @@ export function FtHeader(props) {
   const predSet = useLiveQuery(() =>
     db.settings.get("predictions").then((obj) => obj.settings)
   )
+  const twitchAuthState = useLiveQuery(() =>
+    db.userSessions.get("twitch").then((obj) => obj.authenticated)
+  )
+  const [delayDialogShowing, setDelayDialogShowing] = useState(false)
+  const [selectedAdTime, setSelectedAdTime] = useState(180)
 
   useEffect(() => {
     if (teams === undefined) return
@@ -61,6 +69,19 @@ export function FtHeader(props) {
       .equals("predictions")
       .modify({ "settings.showing": !predSet.showing })
       .then(() => togglePredictions())
+
+  const submitAd = () => {
+    const submitTwitchAdEv = new CustomEvent("submitAd", {
+      detail: {
+        time: selectedAdTime,
+      },
+      bubbles: false,
+      cancelable: false,
+      composed: false,
+    })
+    global.log("DISPATCHING SUBMISSION")
+    return window.dispatchEvent(submitTwitchAdEv)
+  }
 
   if (teams === undefined || predSet === undefined) return null
 
@@ -120,6 +141,41 @@ export function FtHeader(props) {
               disabled={!predSet.available}
               icon={DoubleChevronUpIcon}
               onClick={togglePredictionsShowing}
+              marginRight={8}
+            />
+          </Tooltip>
+          <Dialog
+            isShown={delayDialogShowing}
+            title="Ad break time"
+            onCloseComplete={() => setDelayDialogShowing(false)}
+            confirmLabel="Submit"
+            onConfirm={(close) => {
+              submitAd()
+              close()
+            }}
+          >
+            <Text>
+              Submitting an ad break will wait for the set stream delay before
+              showing
+            </Text>
+            <Select
+              onChange={(event) =>
+                setSelectedAdTime(parseInt(event.target.value))
+              }
+            >
+              <option value="30">30 Seconds</option>
+              <option value="60">1 Minute</option>
+              <option value="90">1 Minute and 30 Seconds</option>
+              <option value="120">2 Minutes</option>
+              <option value="150">2 Minutes and 30 Seconds</option>
+              <option value="180">3 Minutes</option>
+            </Select>
+          </Dialog>
+          <Tooltip content="Send to ad break">
+            <IconButton
+              icon={DollarIcon}
+              disabled={!twitchAuthState}
+              onClick={() => setDelayDialogShowing(true)}
             />
           </Tooltip>
         </Pane>
