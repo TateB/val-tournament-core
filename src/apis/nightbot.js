@@ -166,11 +166,14 @@ const setCommand = (command) => {
   var dbVars
   var userId
   var settingId
+  var settings
 
   return Promise.all(requiredVars[command].map((x) => getSpecifics(x)))
     .then((dbVarsRec) => (dbVars = dbVarsRec))
     .then(() => getSpecifics("nbSession"))
-    .then((sess) => (userId = sess.session.accessToken))
+    .then((sess) => (settings = sess))
+    .then(() => isAuthed(settings))
+    .then(() => (userId = settings.session.accessToken))
     .then(() => getSpecifics("commands"))
     .then((nbSet) => nbSet.find((x) => x.name === command))
     .then((foundCommand) => (settingId = foundCommand.id))
