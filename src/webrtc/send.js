@@ -1,4 +1,3 @@
-import urlExist from "url-exist"
 import db from "../db/db"
 import { connections } from "./connect"
 
@@ -19,50 +18,16 @@ export function sendScores(protocol = "") {
   }
 
   async function logoURL(name, tinx) {
-    const fName = name.replace(/\s+/g, "-").toLowerCase()
-    const logoDBs = [
-      `https://raw.githubusercontent.com/lootmarket/esport-team-logos/master/valorant/${fName}/${fName}-logo.png?raw=true`,
-      `https://raw.githubusercontent.com/TateB/esportslogos/main/oceania/${fName}/${fName}.square.png?raw=true`,
-    ]
+    return db.settings.get("general").then((genset) => {
+      if (tinx === 0 && genset.settings.useTeamOneCustomIcon)
+        return readFile(genset.settings.teamOneCustomIcon[0])
+      if (tinx === 1 && genset.settings.useTeamTwoCustomIcon)
+        return readFile(genset.settings.teamTwoCustomIcon[0])
 
-    return db.teams
-      .get(tinx)
-      .then((sTeam) => {
-        const link = sTeam.iconLink.split("/")
-        const linkName = link[link.length - 2]
-        return linkName === fName ? sTeam.iconLink : false
-      })
-      .then((isSame) => {
-        if (isSame) {
-          return [isSame]
-        }
-        return Promise.all(
-          logoDBs.map(async (val) => ((await urlExist(val)) ? val : null))
-        )
-      })
-      .then((nulls) => nulls.filter((x) => x !== null))
-      .then((urlChqd) => {
-        global.log(urlChqd)
-        return urlChqd[0]
-          ? db.teams
-              .update(tinx, { iconLink: urlChqd[0] })
-              .then(() => urlChqd[0])
-          : "icons/default.png"
-      })
-      .then((url) => {
-        return db.settings.get("general").then((genset) => {
-          if (tinx === 0 && genset.settings.useTeamOneCustomIcon)
-            return readFile(genset.settings.teamOneCustomIcon[0])
-          if (tinx === 1 && genset.settings.useTeamTwoCustomIcon)
-            return readFile(genset.settings.teamTwoCustomIcon[0])
-          if (url === "icons/default.png") {
-            return genset.settings.useCustomIcon
-              ? readFile(genset.settings.customIcon[0])
-              : "icons/default.png"
-          }
-          return url
-        })
-      })
+      return genset.settings.useCustomIcon
+        ? readFile(genset.settings.customIcon[0])
+        : "icons/default.png"
+    })
   }
 
   var teams, settings, genset
@@ -97,7 +62,9 @@ export function sendScores(protocol = "") {
         .then((newlink) => (teams[0].iconLink = newlink))
         .then(() => logoURL(teams[1].name, 1))
         .then((newlink) => (teams[1].iconLink = newlink))
-        .then(() =>
+        .then(() => db.mapbans.where("isBan").equals(0).toArray())
+        .then((mbArr) => mbArr.length)
+        .then((boAmount) =>
           connections
             .filter((x) =>
               protocol === ""
@@ -107,7 +74,9 @@ export function sendScores(protocol = "") {
             .map((x) => {
               global.log("mapping for send")
               global.log(x)
-              return x.peer.send(JSON.stringify({ teams, genset, settings }))
+              return x.peer.send(
+                JSON.stringify({ teams, genset, settings, boAmount })
+              )
             })
         )
     })
@@ -118,33 +87,31 @@ export function setNewTeams(teams) {
 }
 
 export function sendTimer(settings) {
-  return connections
-    .find((x) => x.protocol === "timer" && x.connected === true)
-    .then((conn) => (conn ? conn.peer.send(JSON.stringify(settings)) : null))
+  const timer = connections.find(
+    (x) => x.protocol === "timer" && x.connected === true
+  )
+  return timer ? timer.peer.send(JSON.stringify(settings)) : null
 }
 
 export function sendTimerStart() {
-  return connections
-    .find((x) => x.protocol === "timer" && x.connected === true)
-    .then((conn) =>
-      conn ? conn.peer.send(JSON.stringify({ start: true })) : null
-    )
+  const timer = connections.find(
+    (x) => x.protocol === "timer" && x.connected === true
+  )
+  return timer ? timer.peer.send(JSON.stringify({ start: true })) : null
 }
 
 export function sendTimerStop() {
-  return connections
-    .find((x) => x.protocol === "timer" && x.connected === true)
-    .then((conn) =>
-      conn ? conn.peer.send(JSON.stringify({ stop: true })) : null
-    )
+  const timer = connections.find(
+    (x) => x.protocol === "timer" && x.connected === true
+  )
+  return timer ? timer.peer.send(JSON.stringify({ stop: true })) : null
 }
 
 export function sendTimerReset() {
-  return connections
-    .find((x) => x.protocol === "timer" && x.connected === true)
-    .then((conn) =>
-      conn ? conn.peer.send(JSON.stringify({ reset: true })) : null
-    )
+  const timer = connections.find(
+    (x) => x.protocol === "timer" && x.connected === true
+  )
+  return timer ? timer.peer.send(JSON.stringify({ reset: true })) : null
 }
 
 export function sendMapBans() {
@@ -155,7 +122,7 @@ export function sendMapBans() {
     .then(() => db.teams.toArray())
     .then((arr) => (teams = arr))
     .then(() => db.settings.get("general"))
-    .then((arr) => (genset = arr))
+    .then((arr) => (genset = arr.settings))
     .then(() => db.maps.toArray())
     .then((arr) => arr.map((x) => x.name))
     .then((arr) => (maps = arr))

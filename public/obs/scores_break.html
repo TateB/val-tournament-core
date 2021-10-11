@@ -56,6 +56,24 @@
         background-color: rgb(51, 51, 51);
         border-radius: 15px;
       }
+
+      #leftScore,
+      #leftTeam,
+      #leftLogo,
+      #rightScore,
+      #rightTeam,
+      #rightLogo {
+        transition: all 0.35s ease-out;
+      }
+
+      .nodisplay {
+        display: none;
+      }
+
+      .hidden {
+        opacity: 0;
+        transform: translateX(-150px);
+      }
     </style>
     <script type="text/javascript" src="simplepeer.min.js"></script>
     <script type="text/javascript" src="obs.js"></script>
@@ -76,22 +94,63 @@
         document.getElementById("rightLogo").src = finalTeam[1].iconLink
         document.getElementById("leftLogo").src = finalTeam[0].iconLink
       })
+
+      window.addEventListener("load", (event) => {
+        const allTeams = document.querySelectorAll(".leftTeamEl, .rightTeamEl")
+        const leftTeamEls = document.querySelectorAll(".leftTeamEl")
+        const rightTeamEls = document.querySelectorAll(".rightTeamEl")
+
+        if (document.visibilityState !== "visible") {
+          allTeams.forEach((el) => el.classList.add("hidden", "nodisplay"))
+        }
+
+        window.addEventListener("obsSourceActiveChanged", (evt) => {
+          console.log("source changed", evt.detail)
+          if (evt.detail.active) {
+            setTimeout(() => {
+              console.log("transition finished, queueing changes")
+              console.log(
+                allTeams,
+                leftTeamEls,
+                document.querySelectorAll(".leftTeamEl")
+              )
+              allTeams.forEach((el) => {
+                console.log("el got", el)
+                el.classList.remove("nodisplay")
+              })
+              setTimeout(
+                () =>
+                  leftTeamEls.forEach((el) => el.classList.remove("hidden")),
+                200
+              )
+              setTimeout(
+                () =>
+                  rightTeamEls.forEach((el) => el.classList.remove("hidden")),
+                550
+              )
+            }, 950)
+          } else {
+            document
+            allTeams.forEach((el) => el.classList.add("hidden", "nodisplay"))
+          }
+        })
+      })
     </script>
   </head>
 
   <body>
     <div class="grow"></div>
     <div class="col">
-      <p class="cls-3" id="leftTeam"><%= teams[0].toUpperCase() %></p>
-      <p class="cls-3" id="rightTeam"><%= teams[1].toUpperCase() %></p>
+      <p class="cls-3 leftTeamEl" id="leftTeam">Team A</p>
+      <p class="cls-3 rightTeamEl" id="rightTeam">Team B</p>
     </div>
     <div class="col scores">
-      <p class="cls-3" id="leftScore"></p>
-      <p class="cls-3" id="rightScore"></p>
+      <p class="cls-3 leftTeamEl" id="leftScore"></p>
+      <p class="cls-3 rightTeamEl" id="rightScore"></p>
     </div>
     <div class="icons">
-      <img src="" id="leftLogo" />
-      <img src="" id="rightLogo" />
+      <img class="leftTeamEl" src="icons/default.png" id="leftLogo" />
+      <img class="rightTeamEl" src="icons/default.png" id="rightLogo" />
     </div>
   </body>
 </html>

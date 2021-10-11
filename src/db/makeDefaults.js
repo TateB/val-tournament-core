@@ -1,5 +1,5 @@
-import db from "./db"
 import { v4 as uuidv4 } from "uuid"
+import db from "./db"
 
 const makeDefaults = async () => {
   await db.maps.bulkPut([
@@ -9,6 +9,7 @@ const makeDefaults = async () => {
     { id: 3, name: "haven" },
     { id: 4, name: "icebox" },
     { id: 5, name: "split" },
+    { id: 6, name: "fracture" },
   ])
   await db.sides.bulkPut([
     { id: 0, name: "attack", short: "atk" },
@@ -18,10 +19,11 @@ const makeDefaults = async () => {
   await db.mapbans.bulkPut([
     { id: 0, map: 0, isBan: 1, teamPick: 0, sidePick: 2, isShowing: true },
     { id: 1, map: 1, isBan: 1, teamPick: 1, sidePick: 2, isShowing: true },
-    { id: 2, map: 2, isBan: 0, teamPick: 0, sidePick: 0, isShowing: true },
+    { id: 2, map: 2, isBan: 1, teamPick: 0, sidePick: 2, isShowing: true },
     { id: 3, map: 3, isBan: 0, teamPick: 1, sidePick: 1, isShowing: true },
     { id: 4, map: 4, isBan: 0, teamPick: 0, sidePick: 1, isShowing: true },
-    { id: 5, map: 5, isBan: 1, teamPick: 2, sidePick: 2, isShowing: true },
+    { id: 5, map: 5, isBan: 0, teamPick: 1, sidePick: 0, isShowing: true },
+    { id: 6, map: 6, isBan: 1, teamPick: 2, sidePick: 2, isShowing: true },
   ])
   await db.teams.bulkPut([
     { id: 0, name: "Team A", short: "TEMA", iconLink: "", score: [0, 0, 0] },
@@ -60,6 +62,7 @@ const makeDefaults = async () => {
         useCustomIcon: false,
         customIcon: "",
         useDarkMode: false,
+        needsIntro: true,
       },
     },
     {

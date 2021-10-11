@@ -1,3 +1,16 @@
 [[redirects]]
     from = "/obs/*"
     to = "/obs/:feature.html"
+
+[[redirects]]
+    from ="/twitch/*"
+    to = "/index.html"
+    status = 200
+
+[[redirects]]
+    from = "/nightbot/*"
+    to = "/index.html"
+    status = 200
+
+[context.branch-deploy]
+    NODE_ENV = "development"

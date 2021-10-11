@@ -36,12 +36,26 @@ const submitPredListener = async (e) => {
     .catch((err) => console.error(err.message))
 }
 
+const submitTwitchAd = async (e) => {
+  e.stopPropagation()
+  e.preventDefault()
+  const time = e.detail.time
+
+  return db.settings
+    .get("general")
+    .then((genSet) => delay(genSet.settings.streamDelay * 1000))
+    .then(() => twitch.submitAd(time))
+    .catch((err) => console.error(err.message))
+}
+
 export const createDelayListeners = () => {
   window.addEventListener("submitPred", submitPredListener)
+  window.addEventListener("submitAd", submitTwitchAd)
 }
 
 export const removeDelayListeners = () => {
   window.removeEventListener("submitPred", submitPredListener)
+  window.removeEventListener("submitAd", submitTwitchAd)
 }
 
 function delay(duration) {

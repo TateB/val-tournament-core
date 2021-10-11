@@ -166,11 +166,14 @@ const setCommand = (command) => {
   var dbVars
   var userId
   var settingId
+  var settings
 
   return Promise.all(requiredVars[command].map((x) => getSpecifics(x)))
     .then((dbVarsRec) => (dbVars = dbVarsRec))
     .then(() => getSpecifics("nbSession"))
-    .then((sess) => (userId = sess.session.accessToken))
+    .then((sess) => (settings = sess))
+    .then(() => isAuthed(settings))
+    .then(() => (userId = settings.session.accessToken))
     .then(() => getSpecifics("commands"))
     .then((nbSet) => nbSet.find((x) => x.name === command))
     .then((foundCommand) => (settingId = foundCommand.id))
@@ -192,9 +195,7 @@ const setCommand = (command) => {
       })
     )
     .catch((err) =>
-      Promise.reject(
-        "Nightbot: Error setting command " + command + " :: " + err
-      )
+      console.error("Nightbot: Error setting command " + command + " :: " + err)
     )
 }
 
@@ -215,10 +216,10 @@ const generateCommandText = (command, vars) => {
         const [casters] = vars
         if (casters.length > 1) {
           var finalMsg = "@$(user), Your casters for today are: "
-          vars.map((x, i) =>
-            i === vars.length - 1
+          casters.forEach((x, i) =>
+            i === casters.length - 1
               ? (finalMsg += `${x.name}, ${x.url}`)
-              : (finalMsg += `${x.name}, ${x.url},`)
+              : (finalMsg += `${x.name}, ${x.url}, `)
           )
           resolve(finalMsg)
         } else {
@@ -230,13 +231,20 @@ const generateCommandText = (command, vars) => {
       }
       case "delay": {
         var finalMsg = "@$(user), Stream delay is set to "
-        if (vars[0].minutes)
-          finalMsg +=
-            vars[0].minutes + " minute" + vars[0].minutes > 1 ? "s" : ""
-        if (vars[0].seconds && vars[0].minutes)
-          finalMsg += " and " + vars[0].seconds
-        if (vars[0].seconds && !vars[0].minutes)
-          finalMsg += vars[0].seconds + " seconds"
+        const { minutes, seconds } = vars[0]
+        /* eslint-disable no-unused-expressions */
+        if (minutes > 0) {
+          finalMsg += minutes + " minute"
+          minutes > 1 ? (finalMsg += "s") : undefined
+        }
+        if (seconds > 0 && minutes > 0) {
+          finalMsg += " and "
+        }
+        if (seconds > 0) {
+          finalMsg += seconds + " second"
+          seconds > 1 ? (finalMsg += "s") : undefined
+        }
+        /* eslint-enable no-unused-expressions */
         return resolve(finalMsg)
       }
       case "maps": {

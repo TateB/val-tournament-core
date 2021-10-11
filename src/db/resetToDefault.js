@@ -29,6 +29,7 @@ export const resetSettings = async (setting) => {
           useCustomIcon: false,
           customIcon: "",
           useDarkMode: false,
+          needsIntro: false,
         },
       })
       return
