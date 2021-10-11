@@ -27,6 +27,7 @@ function ManualInput(props) {
     "Map 4",
     "Map 5",
     "Map 6",
+    "Map 7",
   ])
 
   const [dropOptions, setDropOptions] = useState([
@@ -39,6 +40,7 @@ function ManualInput(props) {
         { label: "Breeze" },
         { label: "Bind" },
         { label: "Split" },
+        { label: "Fracture" },
       ],
     },
     {

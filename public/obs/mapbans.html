@@ -11,6 +11,7 @@
       body {
         margin: 0;
         padding: 0;
+        padding-left: 20px;
         display: flex;
         flex-direction: row;
         justify-content: space-around;
@@ -18,11 +19,14 @@
         overflow: hidden;
       }
       .map {
-        margin-top: 50px;
-        width: 250px;
-        height: 600px;
+        margin-top: 5vh;
+        max-width: 250px;
+        margin-left: 20px;
+        margin-right: 20px;
+        height: calc(90vh - 40px);
         display: flex;
         flex-direction: column;
+        background-size: 50%;
       }
 
       .map:last-child {
@@ -63,6 +67,10 @@
         border-left-style: solid;
       }
 
+      .bannedMap h1 {
+        font-size: 1.5em;
+      }
+
       .lowercase {
         text-transform: lowercase;
       }
@@ -76,111 +84,71 @@
       }
 
       .bannedMap {
-        width: 150px;
-        height: 200px;
+        margin-top: 5vh;
+        max-width: 150px;
+        margin-left: 20px;
+        margin-right: 20px;
+        height: calc(90vh - 40px);
+        display: flex;
+        flex-direction: column;
       }
 
       .bannedMap .info {
         min-height: auto;
-        margin-top: 75px;
+        width: 95px;
       }
 
       .bannedMaps {
         max-height: 100vh;
         display: flex;
         flex-direction: column;
-        justify-content: space-around;
         margin-right: 150px;
+        margin-right: 0px;
+        margin-top: 5vh;
+        justify-content: flex-start;
+        flex-direction: column;
       }
 
-      .bannedMap:first-child {
-        margin-top: 50px;
-        margin-bottom: 50px;
+      .bannedMap .info h4 {
+        padding: 0;
+        margin: 0;
       }
 
-      .autoban {
-        color: white;
-        text-align: left;
-        margin-bottom: -20px;
-        font-size: 1.5em;
+      .bannedMapText {
         margin-left: -20px;
+        margin-right: 20px;
+        background-color: #0f1822;
+        padding: 10px;
+        color: white;
+        border-left-color: var(--colour-scheme);
+        border-left-width: 6px;
+        border-left-style: solid;
+      }
+
+      .bannedMapText:last-child {
+        margin-top: 25px;
+      }
+
+      .bannedMapText > * {
+        padding: 0;
+        margin: 0;
       }
 
       .backgroundImage {
-        width: 150px;
-        height: 200px;
+        min-width: 115px;
+        max-width: 150px;
+        height: calc(90vh - 40px);
         z-index: -10;
         position: absolute;
         filter: blur(1px) grayscale(1);
       }
 
-      .twocolumn.bannedMaps {
-        margin-right: 0px;
-        justify-content: space-between;
-        flex-direction: row;
-      }
-
-      .twocolumn .bannedMap {
-        height: 600px;
-        margin-left: 100px;
-        margin-top: 50px;
-      }
-
-      .twocolumn .backgroundImage {
-        height: 600px;
-      }
-
-      .twocolumn .bannedMap:first-child {
-        height: 520px;
-      }
-
-      .twocolumn .bannedMap:first-child .backgroundImage {
-        height: 520px;
-      }
-
-      .autoPickedBo1 .bannedMap:first-child,
-      .autoPickedBo1 .bannedMap:first-child .backgroundImage {
-        height: 600px;
-      }
-
-      .twocolumn .autoban {
-        position: fixed;
-        margin-top: 620px;
-        margin-left: 100px;
-        line-height: 25px;
-      }
-      .twocolumn .bannedMap .info {
-        margin-top: 475px;
-      }
-
-      .twocolumn .bannedMap:first-child .info {
-        margin-top: 400px;
-      }
-
-      .autoPickedBo1 .bannedMap:first-child .info {
-        margin-top: 475px;
-      }
-
       .nodisplay {
         display: none !important;
       }
-      .autoban.nootherbans {
-        position: fixed;
-        margin-top: 680px;
-        margin-left: 25px;
-        line-height: 25px;
-      }
 
-      .autoPickedBo1 .bannedMap .info {
-        min-width: 120px;
-      }
-
-      .autoPickedBo1.bannedMaps {
-        margin-right: 150px;
-      }
-
-      .autoPickedBo1.bannedMaps .bannedMap {
-        margin-left: 50px;
+      #bo1Map {
+        flex-grow: 1;
       }
 
       .iframemap {
@@ -196,11 +164,6 @@
         margin-top: -200px !important;
       }
 
-      .hiddenAutoban {
-        opacity: 0;
-        margin-bottom: 100px !important;
-      }
-
       .bannedMap,
       .map,
       #autobantext {
@@ -209,6 +172,18 @@
 
       * {
         text-transform: uppercase;
+      }
+
+      @media screen and (max-height: 450px) {
+        .spacer {
+          flex-grow: 0;
+        }
+        .map {
+          justify-content: flex-end;
+        }
+        .bannedMap {
+          justify-content: flex-end;
+        }
       }
     </style>
     <script type="text/javascript" src="simplepeer.min.js"></script>
@@ -221,8 +196,15 @@
         const bannedMaps = mapbans.filter(
           (x) => x.isBan === 1 && x.teamPick !== 2
         )
+        if (
+          mapbans.filter((x) => x.teamPick === 2 && x.isBan === 1).length !== 0
+        ) {
+          bannedMaps.splice(0, 0, mapbans.filter((x) => x.teamPick === 2)[0])
+        }
         const pickedMaps = mapbans.filter((x) => x.isBan === 0)
-        const autobanMap = mapbans.filter((x) => x.teamPick === 2)
+        const autopickMap = mapbans.filter(
+          (x) => x.isBan === 0 && x.teamPick === 2
+        )
 
         document.documentElement.style.setProperty(
           "--colour-scheme",
@@ -233,67 +215,75 @@
 
         function setMaps() {
           const body = document.getElementById("main")
-          body.innerHTML = '<div id="bannedMaps" class="bannedMaps"></div>'
-          const bannedDiv = document.getElementById("bannedMaps")
+          var bannedDiv = body
 
-          if (bannedMaps.length === 0) {
-            const noOtherBansDiv = document.createElement("div")
-            const autoBansH3NoOther = document.createElement("h3")
-            const autoBansTextNoOther = document.createTextNode(
-              maps[autobanMap[0].map] + " AUTOBANNED"
-            )
-            autoBansH3NoOther.setAttribute("class", "nootherbans autoban")
+          if (bannedMaps.length === 2) {
+            body.innerHTML = '<div id="bannedMaps" class="bannedMaps"></div>'
+            bannedDiv = document.getElementById("bannedMaps")
+            bannedMaps.map((map) => {
+              const mapName = maps[map.map]
+              const teamPick = teams[map.teamPick].short
+              const textMapEl = document.createElement("div")
+              const pickEl = document.createElement("p")
+              const mapTitleEl = document.createElement("h4")
 
-            autoBansH3NoOther.appendChild(autoBansTextNoOther)
-            noOtherBansDiv.appendChild(autoBansH3NoOther)
-            body.appendChild(noOtherBansDiv)
-            bannedDiv.classList.add("nodisplay")
+              const teamText = document.createTextNode(teamPick + " BAN")
+              const mapTitleText = document.createTextNode(mapName)
+
+              textMapEl.setAttribute("class", "bannedMapText")
+              mapTitleEl.appendChild(mapTitleText)
+              pickEl.appendChild(teamText)
+              textMapEl.appendChild(pickEl)
+              textMapEl.appendChild(mapTitleEl)
+              bannedDiv.appendChild(textMapEl)
+            })
+          } else {
+            bannedMaps.map((map) => {
+              const mapName = maps[map.map]
+              const teamPick = teams[map.teamPick].short
+              const mapEl = document.createElement("div")
+              const bgImgEl = document.createElement("div")
+              const mapTitleEl = document.createElement("h4")
+              const infoEl = document.createElement("div")
+              const pickEl = document.createElement("p")
+              const spanEl = document.createElement("span")
+              const spacerEl = document.createElement("div")
+
+              const mapTitleText = document.createTextNode(mapName)
+              const teamText = document.createTextNode(teamPick + " BAN")
+
+              spacerEl.setAttribute("class", "spacer")
+              mapEl.setAttribute("class", "bannedMap")
+              bgImgEl.setAttribute(
+                "style",
+                "background: url('/obs/maps/" +
+                  mapName +
+                  (isIframe
+                    ? "-baniframe.png');background-position: center;background-size: 1000%;"
+                    : ".png');background-position: center;background-size: 1000%;")
+              )
+              bgImgEl.setAttribute("class", "backgroundImage")
+              infoEl.setAttribute("class", "info")
+              pickEl.setAttribute("class", "pick")
+              spanEl.setAttribute("class", "highlight")
+
+              mapTitleEl.appendChild(mapTitleText)
+              infoEl.appendChild(teamText)
+              infoEl.appendChild(mapTitleEl)
+              mapEl.appendChild(bgImgEl)
+              mapEl.appendChild(spacerEl)
+              mapEl.appendChild(infoEl)
+
+              bannedDiv.appendChild(mapEl)
+            })
           }
-
-          bannedMaps.map((map) => {
-            const mapName = maps[map.map]
-            const teamPick = teams[map.teamPick].short
-            const mapEl = document.createElement("div")
-            const bgImgEl = document.createElement("div")
-            const mapTitleEl = document.createElement("h1")
-            const infoEl = document.createElement("div")
-            const pickEl = document.createElement("p")
-            const spanEl = document.createElement("span")
-
-            const mapTitleText = document.createTextNode(mapName)
-            const teamText = document.createTextNode(teamPick + " BAN")
-
-            mapEl.setAttribute("class", "bannedMap")
-            bgImgEl.setAttribute(
-              "style",
-              "background: url('/obs/maps/" +
-                mapName +
-                (isIframe
-                  ? "-baniframe.png');background-position: center;background-size: cover;"
-                  : ".png');background-position: center;background-size: cover;")
-            )
-            bgImgEl.setAttribute("class", "backgroundImage")
-            infoEl.setAttribute("class", "info")
-            pickEl.setAttribute("class", "pick")
-            spanEl.setAttribute("class", "highlight")
-
-            mapTitleEl.appendChild(mapTitleText)
-            spanEl.appendChild(teamText)
-            pickEl.appendChild(spanEl)
-            infoEl.appendChild(pickEl)
-            mapEl.appendChild(bgImgEl)
-            mapEl.appendChild(mapTitleEl)
-            mapEl.appendChild(infoEl)
-
-            bannedDiv.appendChild(mapEl)
-          })
 
           pickedMaps.map((map) => {
             const mapName = maps[map.map]
             const sidePick = sides[map.sidePick]
             const teamPick = teams[map.teamPick].name
             const enemyTeam =
-              pickedMaps.length === autobanMap.length
+              pickedMaps.length === autopickMap.length
                 ? teams[bannedMaps[bannedMaps.length - 2].teamPick].name
                 : teams[map.teamPick === 1 ? 0 : 1].name
             const pickedDiv = document.getElementById("main")
@@ -322,8 +312,15 @@
                 "style",
                 "background: url('/obs/maps/" +
                   mapName +
-                  ".png');background-position: center;background-size: cover;"
+                  ".png');background-position: center;background-size: 750%;"
               )
+            }
+            if (pickedMaps.length === 1) {
+              mapEl.setAttribute("id", "bo1Map")
+            }
+            if (autopickMap.length === 1) {
+              pickText.nodeValue = "AUTO PICK"
+              teamText.nodeValue = ""
             }
             infoEl.setAttribute("class", "info")
             pickEl.setAttribute("class", "pick")
@@ -355,26 +352,6 @@
             pickedDiv.appendChild(mapEl)
           })
 
-          if (bannedMaps.length > 2) {
-            bannedDiv.classList.add("twocolumn")
-          }
-
-          if (pickedMaps.length !== autobanMap.length) {
-            const spacerInnerEl = document.createElement("div")
-            const autobanEl = document.createElement("h3")
-            const autobanText = document.createTextNode(
-              maps[autobanMap[0].map] + " AUTOBANNED"
-            )
-            spacerInnerEl.setAttribute("class", "spacer")
-            autobanEl.setAttribute("class", "autoban")
-            autobanEl.setAttribute("id", "autobantext")
-            autobanEl.appendChild(autobanText)
-            bannedDiv.appendChild(spacerInnerEl)
-            bannedDiv.appendChild(autobanEl)
-          } else {
-            bannedDiv.classList.add("autoPickedBo1")
-          }
-
           if (document.visibilityState !== "visible") {
             const mapDivs = document.querySelectorAll(".bannedMap, .map")
             for (const mapDiv of mapDivs) {
@@ -389,9 +366,6 @@
           window.addEventListener("obsSourceActiveChanged", (evt) => {
             if (evt.detail.active) {
               setTimeout(() => {
-                document
-                  .getElementById("autobantext")
-                  .classList.remove("nodisplay")
                 const mapDivs = document.querySelectorAll(".bannedMap, .map")
                 for (const [inx, mapDiv] of mapDivs.entries()) {
                   mapDiv.classList.remove("nodisplay")
@@ -400,13 +374,6 @@
                     200 * (inx + 1)
                   )
                 }
-                setTimeout(
-                  () =>
-                    document
-                      .getElementById("autobantext")
-                      .classList.remove("hiddenAutoban"),
-                  200 * (mapDivs.length + 1)
-                )
               }, 850)
             } else {
               const mapDivs = document.querySelectorAll(".bannedMap, .map")
@@ -414,16 +381,11 @@
                 mapDiv.classList.add("nodisplay")
                 mapDiv.classList.add("hidden")
               }
-              document
-                .getElementById("autobantext")
-                .classList.add("nodisplay", "hiddenAutoban")
             }
           })
         }
       })
     </script>
   </head>
-  <body id="main">
-    <div id="bannedMaps"></div>
-  </body>
+  <body id="main"></body>
 </html>
