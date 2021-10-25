@@ -1,27 +1,42 @@
 import {
-  Pane,
-  Text,
-  Checkbox,
-  Popover,
   Button,
-  TextInputField,
+  Checkbox,
   FilePicker,
+  Pane,
+  Popover,
+  Text,
+  TextInputField,
 } from "evergreen-ui"
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 import { BlockPicker } from "react-color"
-import Layout from "./etc/Layout"
+import { nightbot } from "../apis/apis"
 import db from "../db/db"
 import { resetSettings } from "../db/resetToDefault"
-import { nightbot } from "../apis/apis"
+import { sendScores } from "../webrtc/send"
+import Layout from "./etc/Layout"
 
 function Settings(props) {
   const [settings, setSettings] = useState({
     streamDelay: 180,
   })
 
+  const [iconNames, setIconNames] = useState(["Custom Icon", "Custom Icon"])
+
   useEffect(() => {
     db.settings.get("general").then((res) => {
+      var iconNameRef = ["Custom Icon", "Custom Icon"]
       setSettings(res.settings)
+      if (
+        res.settings.teamOneCustomIcon[0] &&
+        res.settings.teamOneCustomIcon[0].name
+      )
+        iconNameRef[0] = res.settings.teamOneCustomIcon[0].name
+      if (
+        res.settings.teamTwoCustomIcon[0] &&
+        res.settings.teamTwoCustomIcon[0].name
+      )
+        iconNameRef[1] = res.settings.teamTwoCustomIcon[0].name
+      setIconNames(iconNameRef)
     })
   }, [setSettings])
 
@@ -41,10 +56,30 @@ function Settings(props) {
     })
   }
 
-  const submitToDb = () =>
+  const submitToDb = () => {
+    var scUpNeed = false
     db.settings
-      .update("general", { settings: settings })
-      .then(() => nightbot.setCommand("delay"))
+      .get("general")
+      .then((res) => {
+        const gensetRef = res.settings
+        if (
+          gensetRef.useTeamOneCustomIcon !== settings.useTeamOneCustomIcon ||
+          gensetRef.useTeamTwoCustomIcon !== settings.useTeamTwoCustomIcon ||
+          gensetRef.teamOneCustomIcon !== settings.teamOneCustomIcon ||
+          gensetRef.teamTwoCustomIcon !== settings.teamTwoCustomIcon
+        ) {
+          return (scUpNeed = true)
+        } else {
+          return (scUpNeed = false)
+        }
+      })
+      .then(() =>
+        db.settings
+          .update("general", { settings: settings })
+          .then(() => nightbot.setCommand("delay"))
+      )
+      .then(() => (scUpNeed ? sendScores() : null))
+  }
 
   const resetToDefault = () => {
     resetSettings("general")
@@ -162,7 +197,7 @@ function Settings(props) {
               disabled={!settings.useTeamOneCustomIcon}
               width={250}
               onChange={(file) => setValue("teamOneCustomIcon", file)}
-              placeholder="Custom Icon"
+              placeholder={iconNames[0]}
             />
             <Checkbox
               marginY={8}
@@ -177,7 +212,7 @@ function Settings(props) {
               disabled={!settings.useTeamTwoCustomIcon}
               width={250}
               onChange={(file) => setValue("teamTwoCustomIcon", file)}
-              placeholder="Custom Icon"
+              placeholder={iconNames[1]}
             />
           </Pane>
         </Pane>

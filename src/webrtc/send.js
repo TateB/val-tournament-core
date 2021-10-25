@@ -6,26 +6,15 @@ import { connections } from "./connect"
 // SETTINGS: reversed, useVOTColours, useCustomIcon
 
 export function sendScores(protocol = "") {
-  function readFile(file) {
-    return new Promise((resolve, reject) => {
-      var fr = new FileReader()
-      fr.onload = () => {
-        resolve(fr.result)
-      }
-      fr.onerror = reject
-      fr.readAsDataURL(file)
-    })
-  }
-
   async function logoURL(name, tinx) {
     return db.settings.get("general").then((genset) => {
       if (tinx === 0 && genset.settings.useTeamOneCustomIcon)
-        return readFile(genset.settings.teamOneCustomIcon[0])
+        return genset.settings.teamOneCustomIcon[0]
       if (tinx === 1 && genset.settings.useTeamTwoCustomIcon)
-        return readFile(genset.settings.teamTwoCustomIcon[0])
+        return genset.settings.teamTwoCustomIcon[0]
 
       return genset.settings.useCustomIcon
-        ? readFile(genset.settings.customIcon[0])
+        ? genset.settings.customIcon[0]
         : "icons/default.png"
     })
   }
@@ -74,9 +63,40 @@ export function sendScores(protocol = "") {
             .map((x) => {
               global.log("mapping for send")
               global.log(x)
-              return x.peer.send(
-                JSON.stringify({ teams, genset, settings, boAmount })
-              )
+              // If icon is a file/blob, chunk data so logos can be transferred without crash
+              function sendAsChunks(teamNum) {
+                const iconStore = teams[teamNum].iconLink
+                x.peer.send(`${teamNum}_chunk_img_start`)
+                return iconStore.arrayBuffer().then((buffer) => {
+                  const chunkSize = 16 * 1024
+                  while (buffer.byteLength) {
+                    const chunk = buffer.slice(0, chunkSize)
+                    buffer = buffer.slice(chunkSize, buffer.byteLength)
+                    x.peer.send(chunk)
+                  }
+                  return x.peer.send(`${teamNum}_chunk_img_end`)
+                })
+              }
+              const checkForChunks = (teamNum) =>
+                new Promise((resolve, reject) => {
+                  teams[teamNum].iconLink instanceof Blob
+                    ? sendAsChunks(teamNum)
+                        .then(() => (teams[teamNum].iconLink = "chunked"))
+                        .then(() => resolve())
+                    : resolve()
+                })
+              return checkForChunks(0)
+                .then(() => checkForChunks(1))
+                .then(() =>
+                  x.peer.send(
+                    JSON.stringify({
+                      teams,
+                      genset,
+                      settings,
+                      boAmount,
+                    })
+                  )
+                )
             })
         )
     })

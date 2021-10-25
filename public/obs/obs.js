@@ -3,6 +3,12 @@ const params = new URLSearchParams(window.location.hash.substr(1))
 const roomID = params.get("roomID")
 const recievedData = {
   state: {},
+  chunkData: {
+    receiving: false,
+    id: 0,
+    fileChunks: [],
+    processedFiles: [],
+  },
   dataListener: (val) => {},
   set data(val) {
     this.state = val
@@ -17,7 +23,7 @@ const recievedData = {
 }
 
 var currentPeer
-const wsURI = "wss://signal.val.tatebulic.com.au:443/?roomID=" + roomID
+const wsURI = "ws://localhost:6503/?roomID=" + roomID
 const websocket = new WebSocket(wsURI, protocol)
 websocket.onopen = () => {
   currentPeer = createPeer()
@@ -33,8 +39,6 @@ function createPeer() {
       iceServers: [
         { urls: "stun:stun1.l.google.com:19302" },
         { urls: "stun:stun2.l.google.com:19302" },
-        { urls: "stun:stun3.l.google.com:19302" },
-        { urls: "stun:stun4.l.google.com:19302" },
       ],
     },
   })
@@ -49,7 +53,35 @@ function createPeer() {
   })
 
   p.on("data", (data) => {
-    recievedData.data = JSON.parse(data.toString())
+    const chunkCheck = data.toString().split("_")
+    const chunkTeamId = parseInt(chunkCheck[0])
+    const chunkData = recievedData.chunkData
+    if (chunkCheck[3] === "start") {
+      console.log("start")
+      chunkData.receiving = true
+      chunkData.id = chunkTeamId
+    } else if (chunkCheck[3] === "end") {
+      console.log("end")
+      chunkData.receiving = false
+      const file = new Blob(chunkData.fileChunks)
+      chunkData.processedFiles[chunkTeamId] = URL.createObjectURL(file)
+      console.log(file)
+      console.log(chunkData.processedFiles[chunkTeamId])
+      chunkData.fileChunks = []
+    } else if (chunkData.receiving) {
+      console.log("rec")
+      chunkData.fileChunks.push(data)
+    } else {
+      console.log("else")
+      const finalisedForm = JSON.parse(data.toString())
+      if (chunkData.processedFiles[0])
+        finalisedForm.teams[0].iconLink = chunkData.processedFiles[0]
+      if (chunkData.processedFiles[1])
+        finalisedForm.teams[1].iconLink = chunkData.processedFiles[1]
+      chunkData.processedFiles = []
+      recievedData.data = finalisedForm
+    }
+    recievedData.chunkData = chunkData
   })
 
   p.on("close", (data) => {
