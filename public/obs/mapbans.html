@@ -20,7 +20,7 @@
       }
       .map {
         margin-top: 5vh;
-        max-width: 250px;
+        width: 190px;
         margin-left: 20px;
         margin-right: 20px;
         height: calc(90vh - 40px);
@@ -193,18 +193,18 @@
       recievedData.registerListener((newVal) => {
         const { teams, mapbans, genset, maps, sides } = newVal
         const finalTeam = [teams[0], teams[1]]
-        const bannedMaps = mapbans.filter(
+        const autoBannedMaps = mapbans.filter(
+          (x) => x.isBan === 1 && x.teamPick === 2
+        )
+        var bannedMaps = mapbans.filter(
           (x) => x.isBan === 1 && x.teamPick !== 2
         )
-        if (
-          mapbans.filter((x) => x.teamPick === 2 && x.isBan === 1).length !== 0
-        ) {
-          bannedMaps.splice(0, 0, mapbans.filter((x) => x.teamPick === 2)[0])
-        }
+        bannedMaps = autoBannedMaps.concat(bannedMaps)
         const pickedMaps = mapbans.filter((x) => x.isBan === 0)
         const autopickMap = mapbans.filter(
           (x) => x.isBan === 0 && x.teamPick === 2
         )
+        console.log(autopickMap)
 
         document.documentElement.style.setProperty(
           "--colour-scheme",
@@ -318,14 +318,18 @@
             if (pickedMaps.length === 1) {
               mapEl.setAttribute("id", "bo1Map")
             }
-            if (autopickMap.length === 1) {
-              pickText.nodeValue = "AUTO PICK"
-              teamText.nodeValue = ""
-            }
             infoEl.setAttribute("class", "info")
             pickEl.setAttribute("class", "pick")
             spanEl.setAttribute("class", "highlight")
             spanSideEl.setAttribute("class", "highlight")
+            if (autopickMap.length === 1 && map === autopickMap[0]) {
+              pickText.nodeValue = "REMAINDER"
+              teamText.nodeValue = "AUTO PICK"
+            }
+            if (map.sidePick === 2) {
+              sideText.nodeValue = "SIDES"
+              enemyText.nodeValue = "TBD"
+            }
 
             mapTitleEl.appendChild(mapTitleText)
             spanSideEl.appendChild(sideText)
