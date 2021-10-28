@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --colour-scheme: #fd4453;
+      }
+    </style>
+    <script type="text/javascript" src="/obs/simplepeer.min.js"></script>
+    <script type="text/javascript" src="/obs/obs.js"></script>
+    <script>
+      recievedData.registerListener((newVal) => {
+        const { genset, teams, settings, boAmount } = newVal
+        const finalTeam = settings.reversed
+          ? [teams[1], teams[0]]
+          : [teams[0], teams[1]]
+        document.documentElement.style.setProperty(
+          "--colour-scheme",
+          genset.useVOTColours ? "#fd4453" : genset.customColour
+        )
+        document.getElementById("rightTeam").innerHTML =
+          finalTeam[1].name.toUpperCase()
+        document.getElementById("leftTeam").innerHTML =
+          finalTeam[0].name.toUpperCase()
+        document.getElementById("rightScore").innerHTML = finalTeam[1].maps
+        document.getElementById("leftScore").innerHTML = finalTeam[0].maps
+        document
+          .getElementById("imageRight")
+          .setAttribute("xlink:href", finalTeam[1].iconLink)
+        document
+          .getElementById("imageLeft")
+          .setAttribute("xlink:href", finalTeam[0].iconLink)
+      })
+    </script>
+    <style>
+      .inSvg {
+        height: 30px;
+        width: 30px;
+        padding: 5px;
+        background-color: #000;
+        border-radius: 5px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <svg
+      id="Layer_1"
+      data-name="Layer 1"
+      xmlns="http://www.w3.org/2000/svg"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+      viewBox="0 0 1920 1080"
+    >
+      <defs>
+        <style>
+          .cls-1,
+          .cls-2,
+          .cls-3,
+          .cls-4,
+          .cls-5 {
+            stroke: #fff;
+            stroke-miterlimit: 10;
+            stroke-opacity: 0.75;
+          }
+          .cls-1 {
+            fill: url(#linear-gradient);
+          }
+          .cls-2 {
+            fill: url(#linear-gradient-2);
+          }
+          .cls-3 {
+            fill: url(#linear-gradient-3);
+          }
+          .cls-4 {
+            fill: url(#linear-gradient-4);
+          }
+          .cls-5 {
+            fill: url(#linear-gradient-5);
+          }
+          .cls-6 {
+            fill: url(#New_Gradient_Swatch_1);
+          }
+          .cls-7 {
+            fill: url(#New_Gradient_Swatch_1-2);
+          }
+          .cls-8 {
+            font-size: 18px;
+          }
+          .cls-12,
+          .cls-8,
+          .cls-9 {
+            fill: #fff;
+          }
+          .cls-11,
+          .cls-12,
+          .cls-8 {
+            font-family: Purista-Bold, Purista;
+            font-weight: 700;
+          }
+          .cls-9 {
+            font-size: 12px;
+            font-family: Purista-Medium, Purista;
+            font-weight: 500;
+          }
+          .cls-10 {
+            letter-spacing: -0.08em;
+          }
+          .cls-12 {
+            font-size: 24px;
+          }
+        </style>
+        <linearGradient
+          id="linear-gradient"
+          x1="1564.17"
+          x2="1564.17"
+          y2="67.5"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop offset="0" stop-color="#2b1e41" />
+          <stop offset="1" stop-color="#130629" />
+        </linearGradient>
+        <linearGradient
+          id="linear-gradient-2"
+          x1="362.17"
+          x2="362.17"
+          y2="67.5"
+          xlink:href="#linear-gradient"
+        />
+        <linearGradient
+          id="linear-gradient-3"
+          x1="1316.07"
+          x2="1316.07"
+          y2="28.73"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop offset="0" stop-color="#2b1e41" />
+          <stop offset="1" stop-color="#14072a" />
+        </linearGradient>
+        <linearGradient
+          id="linear-gradient-4"
+          x1="608.07"
+          x2="608.07"
+          y2="28.73"
+          xlink:href="#linear-gradient-3"
+        />
+        <linearGradient
+          id="linear-gradient-5"
+          x1="962.18"
+          x2="962.18"
+          y2="20.5"
+          xlink:href="#linear-gradient-3"
+        />
+        <linearGradient
+          id="New_Gradient_Swatch_1"
+          x1="1046.75"
+          y1="66.5"
+          x2="1046.75"
+          y2="122.5"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop offset="0" stop-color="#2c1f42" />
+          <stop offset="1" stop-color="#14072a" />
+        </linearGradient>
+        <linearGradient
+          id="New_Gradient_Swatch_1-2"
+          x1="872.75"
+          y1="66.5"
+          x2="872.75"
+          y2="122.5"
+          xlink:href="#New_Gradient_Swatch_1"
+        />
+        <image
+          id="imageLeft"
+          width="122"
+          height="122"
+          xlink:href="/obs/icons/AEN.png"
+        />
+        <image
+          id="imageRight"
+          width="122"
+          height="122"
+          xlink:href="/obs/icons/AEN.png"
+        />
+      </defs>
+      <rect class="cls-1" x="1528.5" width="71.34" height="67.5" />
+      <rect class="cls-2" x="326.5" width="71.34" height="67.5" />
+      <polygon
+        class="cls-3"
+        points="1485.26 0 1485.26 20.2 1476.73 28.73 1156.5 28.73 1146.89 19.11 1146.89 0 1485.26 0"
+      />
+      <polygon
+        class="cls-4"
+        points="777.25 0 777.25 20.2 768.73 28.73 448.5 28.73 438.89 19.11 438.89 0 777.25 0"
+      />
+      <rect class="cls-5" x="781.5" width="361.36" height="20.5" />
+      <polygon
+        class="cls-6"
+        points="1046.5 66.5 1075 95 1047.5 122.5 1018.5 93.5 1046.5 66.5"
+      />
+      <polygon
+        class="cls-7"
+        points="872.5 66.5 901 95 873.5 122.5 844.5 93.5 872.5 66.5"
+      />
+      <text
+        class="cls-8"
+        id="leftTeam"
+        text-anchor="middle"
+        transform="translate(608 20.12)"
+      >
+        TEAM A
+      </text>
+      <text
+        class="cls-8"
+        id="rightTeam"
+        text-anchor="middle"
+        transform="translate(1316 20.12)"
+      >
+        TEAM B
+      </text>
+      <text class="cls-9" transform="translate(868.16 14.09)">
+        PL
+        <tspan class="cls-10" x="13.67" y="0">AY</tspan>
+        <tspan x="26.51" y="0">AEN -</tspan>
+        <tspan class="cls-11" x="58.92" y="0">$3000 SPRING SERIES</tspan>
+      </text>
+      <text
+        class="cls-12"
+        id="leftScore"
+        text-anchor="middle"
+        transform="translate(872.5 102.38)"
+      >
+        0
+      </text>
+      <text
+        class="cls-12"
+        id="rightScore"
+        text-anchor="middle"
+        transform="translate(1047 102.38)"
+      >
+        0
+      </text>
+      <use transform="translate(331 3) scale(0.5)" xlink:href="#imageLeft" />
+      <use transform="translate(1533 3) scale(0.5)" xlink:href="#imageRight" />
+    </svg>
+  </body>
+</html>
