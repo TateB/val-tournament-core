@@ -20,7 +20,7 @@
       }
       .map {
         margin-top: 5vh;
-        width: 190px;
+        width: 250px;
         margin-left: 20px;
         margin-right: 20px;
         height: calc(90vh - 40px);
@@ -213,6 +213,14 @@
 
         setMaps()
 
+        function checkIfShortNeeded(team) {
+          if (team.name.length > 15) {
+            return team.short
+          } else {
+            return team.name
+          }
+        }
+
         function setMaps() {
           const body = document.getElementById("main")
           var bannedDiv = body
@@ -281,11 +289,12 @@
           pickedMaps.map((map) => {
             const mapName = maps[map.map]
             const sidePick = sides[map.sidePick]
-            const teamPick = teams[map.teamPick].name
-            const enemyTeam =
+            const teamPick = checkIfShortNeeded(teams[map.teamPick])
+            const enemyTeamRef =
               pickedMaps.length === autopickMap.length
-                ? teams[bannedMaps[bannedMaps.length - 2].teamPick].name
-                : teams[map.teamPick === 1 ? 0 : 1].name
+                ? teams[bannedMaps[bannedMaps.length - 2].teamPick]
+                : teams[map.teamPick === 1 ? 0 : 1]
+            const enemyTeam = checkIfShortNeeded(enemyTeamRef)
             const pickedDiv = document.getElementById("main")
             const mapEl = document.createElement("div")
             const mapTitleEl = document.createElement("h1")
